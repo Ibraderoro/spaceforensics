@@ -1,0 +1,512 @@
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>SPACEFORENSICS — Galaxy 15 Scientific Integrity Audit</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    background: #ffffff;
+    color: #1f2328;
+    padding: 40px 24px 60px;
+  }
+  .page { max-width: 780px; margin: 0 auto; }
+  h1 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    letter-spacing: -0.3px;
+  }
+  .meta {
+    font-size: 12px;
+    color: #57606a;
+    margin-bottom: 28px;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 14px;
+  }
+  .meta span { margin-right: 20px; }
+  h2 {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #57606a;
+    margin: 32px 0 12px;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 6px;
+  }
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .stat-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 14px 16px;
+    background: #f7f8fa;
+    text-align: center;
+  }
+  .stat-card .num { font-size: 28px; font-weight: 700; }
+  .stat-card .lbl { font-size: 11px; color: #57606a; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+  .critical .num { color: #b91c1c; }
+  .high .num     { color: #c2410c; }
+  .medium .num   { color: #b45309; }
+  .low .num      { color: #374151; }
+
+  .issue {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .issue-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 16px;
+    background: #f7f8fa;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .badge {
+    font-size: 10px;
+    font-weight: 700;
+    font-family: "SF Mono", "Fira Code", monospace;
+    padding: 3px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .badge-CRITICAL { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+  .badge-HIGH     { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+  .badge-MEDIUM   { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+  .badge-LOW      { background: #f7f8fa; color: #374151; border: 1px solid #d1d5db; }
+  .id-badge {
+    font-size: 10px;
+    font-family: "SF Mono", "Fira Code", monospace;
+    background: #f7f8fa;
+    border: 1px solid #d1d5db;
+    color: #57606a;
+    padding: 3px 8px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .issue-title { font-weight: 600; font-size: 13.5px; color: #1f2328; }
+  .issue-body { padding: 14px 16px; display: grid; gap: 10px; }
+  .field { display: grid; grid-template-columns: 130px 1fr; gap: 6px; font-size: 12.5px; }
+  .field-label { color: #57606a; font-weight: 600; }
+  .field-value { color: #1f2328; }
+  code {
+    font-family: "SF Mono", "Fira Code", monospace;
+    font-size: 11.5px;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+  .fix-box {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 12.5px;
+    color: #166534;
+  }
+  .fix-label {
+    font-weight: 700;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 3px;
+    color: #15803d;
+  }
+  .note { font-size: 12px; color: #57606a; font-style: italic; margin-top: 6px; }
+  .toc { margin-bottom: 28px; }
+  .toc ul { list-style: none; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 2px 24px; }
+  .toc li { font-size: 12.5px; padding: 2px 0; }
+  .toc a { color: #3b82d4; text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  footer {
+    margin-top: 48px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+    text-align: center;
+    font-size: 12px;
+    color: #57606a;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <h1>SPACEFORENSICS — Galaxy 15 Scientific Integrity Audit</h1>
+  <div class="meta">
+    <span><strong>Case:</strong> galaxy-15 · 2010-04-05T09:48:00Z</span>
+    <span><strong>Scope:</strong> case.json · normalized CSV · server.js · aiEngine.js · frontend · tests</span>
+    <span><strong>Audit date:</strong> 2025</span>
+  </div>
+
+  
+  <div class="summary-grid">
+    <div class="stat-card critical"><div class="num">3</div><div class="lbl">Critical</div></div>
+    <div class="stat-card high"><div class="num">7</div><div class="lbl">High</div></div>
+    <div class="stat-card medium"><div class="num">7</div><div class="lbl">Medium</div></div>
+    <div class="stat-card low"><div class="num">4</div><div class="lbl">Low</div></div>
+  </div>
+
+  
+  <h2>Critical</h2>
+
+  
+  <div class="issue" id="C1">
+    <div class="issue-header">
+      <span class="badge badge-CRITICAL">CRITICAL</span>
+      <span class="id-badge">C1</span>
+      <span class="issue-title">Variable name in case.json does not match the actual CDF variable fetched</span>
+    </div>
+    <div class="issue-body">
+      <div class="field"><span class="field-label">File</span><span class="field-value"><code>cases/galaxy-15/case.json</code> line 34 · <code>fetch_galaxy15.py</code> line 41</span></div>
+      <div class="field"><span class="field-label">Problem</span><span class="field-value"><code>case.json</code> declares <code>"variable": "E_1MEV_IC"</code> for <code>GOES11_K0_EP8</code>. The raw CDF file (confirmed in <code>GOES11_K0_EP8.json</code> line 941) and the fetch script both use variable name <code>E2</code> (electrons &gt;2 MeV). <code>E_1MEV_IC</code> does not exist in this dataset. The provenance metadata emitted to the API under <code>/timeline</code> and <code>/evidence-graph</code> therefore carries a nonexistent variable identifier for every EP8 record.</span></div>
+      <div class="field"><span class="field-label">Why it matters</span><span class="field-value">Any downstream consumer relying on the <code>variable</code> field to look up instrument documentation, calibration factors, or uncertainty bounds will be directed to a nonexistent channel. The test <code>T-EM-7</code> in <code>evidenceModel.test.js</code> (line 75) hard-asserts <code>E_1MEV_IC</code>, so the test suite is validating and propagating the wrong identifier.</span></div>
+      <div class="fix-box"><span class="fix-label">Recommended fix</span>Change <code>case.json</code> line 34 to <code>"variable": "E2"</code>. Update <code>evidenceModel.test.js</code> line 75 to assert <code>'E2'</code>. Also update the description on line 33 of <code>case.json</code> to read "Electron Flux sensor channel E2 (&gt;2 MeV)" to match the LABLAXIS metadata in the CDF.</div>
+    </div>
+  </div>
+
+  
+  <div class="issue" id="C2">
+    <div class="issue-header">
+      <span class="badge badge-CRITICAL">CRITICAL</span>
+      <span class="id-badge">C2</span>
+      <span class="issue-title">Confidence integers presented as sortable scientific scores without statistical basis</span>
+    </div>
+    <div class="issue-body">
+      <div class="field"><span class="field-label">File</span><span class="field-value"><code>backend/services/aiEngine.js</code> lines 173–183, 280, 297, 312, 327 · <code>frontend/src/components/HypothesisMatrix.jsx</code> line 259 · <code>frontend/src/components/ReportModal.jsx</code> line 38 · <code>frontend/src/App.jsx</code> line 45</span></div>
+      <div class="field"><span class="field-label">Problem</span><span class="field-value">The heuristic fallback assigns <code>esdScore</code> starting at 60, then adds 15 if ≥5 elevated flux rows, adds 10 if peak &gt;2000, adds 5 if spike &gt;500. <code>seuScore</code> starts at 50 and adds 10/5 for similar counts. These arbitrary additive integers are stored as <code>confidence</code> and directly drive hypothesis sort order in the UI and report. The LLM path maps categorical assessments back to integers (85/72/55/45/25) with equal arbitrariness. Pass 2 further adjusts by −15/−10/−5 per severity. None of these numbers have a statistical derivation, calibration dataset, or uncertainty bound.</span></div>
+      <div class="field"><span class="field-label">Why it matters</span><span class="field-value">Presenting an integer like "85" to a user implies probabilistic precision that does not exist. The UI and report sort and rank hypotheses by these numbers, creating an authoritative-looking ordering from what are purely arbitrary additive heuristics. This is the most direct mechanism for false scientific precision in the system.</span></div>
+      <div class="fix-box"><span class="fix-label">Recommended fix</span>Remove <code>confidence</code> from the heuristic output entirely. Sort hypotheses by categorical assessment using a defined ordinal mapping (e.g. strongly_supported &gt; supported &gt; mixed &gt; weakly_supported &gt; insufficient_evidence). Remove all integer arithmetic from Pass 2 score adjustment. The UI should sort by assessment tier, not a number. Any retained integer field must be labelled explicitly as "heuristic ordering index — not a probability."</div>
+    </div>
+  </div>
+
+  
+  <div class="issue" id="C3">
+    <div class="issue-header">
+      <span class="badge badge-CRITICAL">CRITICAL</span>
+      <span class="id-badge">C3</span>
+      <span class="issue-title"><code>parseEvidenceCSV</code> filename is hardcoded to a single case, silently ignoring the <code>caseId</code> parameter</span>
+    </div>
+    <div class="issue-body">
+      <div class="field"><span class="field-label">File</span><span class="field-value"><code>backend/server.js</code> line 69</span></div>
+      <div class="field"><span class="field-label">Problem</span><span class="field-value"><code>const csvPath = path.join(CASES_DIR, caseId, 'normalized', 'galaxy15_evidence.csv');</code> — the filename <code>galaxy15_evidence.csv</code> is hardcoded. The function accepts a <code>caseId</code> parameter and is called by the generic routes <code>/api/cases/:id/timeline</code>, <code>/api/cases/:id/evidence-graph</code>, <code>/api/cases/:id/investigate</code>, and <code>/api/cases/:id/challenge</code>. Any request for a different case silently reads the Galaxy 15 CSV or returns 404 if the galaxy-15 path is wrong under the new case directory.</span></div>
+      <div class="field"><span class="field-label">Why it matters</span><span class="field-value">If a second case is added, the API will silently serve Galaxy 15 evidence data under any case ID, producing entirely wrong evidence for the new case without any error signal. This is a silent data integrity failure.</span></div>
+      <div class="fix-box"><span class="fix-label">Recommended fix</span>Replace the hardcoded filename with a glob of <code>normalized/*_evidence.csv</code> within the case directory, or use a convention of <code>{caseId}_evidence.csv</code>. At minimum, add a clear TODO comment that this is broken for multi-case use and a runtime guard that rejects requests for any case other than <code>galaxy-15</code>.</div>
+    </div>
+  </div>
+
+  
+  <h2>High</h2>
+
+  
+  <div class="issue" id="H1">
+    <div class="issue-header">
+      <span class="badge badge-HIGH">HIGH</span>
+      <span class="id-badge">H1</span>
+      <span class="issue-title">EP8 variable description in case.json says "1 MeV" but channel E2 measures electrons &gt;2 MeV</span>
+    </div>
+    <div class="issue-body">
+      <div class="field"><span class="field-label">File</span><span class="field-value"><code>cases/galaxy-15/case.json</code> lines 32–33</span></div>
+      <div class="field"><span class="field-label">Problem</span><span class="field-value">The description reads "5-minute averaged electron and proton flux" but EP8 E2 measures only electrons (no protons). The <code>variable</code> field (already cited in C1) reinforces the mismatch. The GOES-11 K0 EP8 dataset does contain proton channels (P1–P5), but the fetched variable <code>E2</code> is exclusively an electron flux channel. Proton data is never downloaded or present.</span></div>
+      <div class="field"><span class="field-label">Why it matters</span><span class="field-value">A description claiming proton data that is not present is potentially misleading to analysts evaluating whether proton-induced SEU is supported or excluded by the dataset. The absence of proton data is a key scientific limitation, not a data feature.</span></div>
+      <div class="fix-box"><span class="fix-label">Recommended fix</span>Change <code>case.json</code> description to "GOES-11 Energetic Particle Sensor — 5-minute averaged integral electron flux (E2 channel, electrons &gt;2 MeV). No proton data was retrieved for this case." Add a scientific_limitation entry noting the absence of proton flux data.</div>
+    </div>
+  </div>
+
+  
+  <div class="issue" id="H2">
+    <div class="issue-header">
+      <span class="badge badge-HIGH">HIGH</span>
+      <span class="id-badge">H2</span>
+      <span class="issue-title"><code>aiEngine.js</code> hardcodes case ID <code>'galaxy-15'</code>, breaking multi-case architecture</span>
+    </div>
+    <div class="issue-body">
+      <div class="field"><span class="field-label">File</span><span class="field-value"><code>backend/services/aiEngine.js</code> lines 709, 772</span></div>
+      <div class="field"><span class="field-label">Problem</span><span class="field-value"><code>buildEvidenceSnapshot(evidenceStream, 'galaxy-15')</code> is hardcoded in both <code>generateHypothesesPass</code> and <code>redTeamChallengePass</code>. The <code>caseId</code> is used to load <code>scientific_limitations</code> from <code>case.json</code>. Any invocation with a different case's evidence rows will silently load Galaxy 15 limitations.</span></div>
+      <div class="field"><span class="field-label">Why it matters</span><span class="field-value">Scientific limitations are case-specific. Loading Galaxy 15's limitations for a different case (e.g. a GPS satellite anomaly) would inject factually incorrect constraint language into every AI prompt and every heuristic analysis, corrupting the scientific framing of that investigation.</span></div>
+      <div class="fix-box"><span class="fix-label">Recommended fix</span>Pass <code>caseId</code> as a parameter to both functions. The server already knows the <code>caseId</code> from the route parameter; thread it through.</div>
+    </div>
+  </div>
+
+  
+  <div class="issue" id="H3">
+    <div class="issue-header">
+      <span class="badge badge-HIGH">HIGH</span>
+      <span class="id-badge">H3</span>
+      <span class="issue-title">Magnetic field variable in case.json (<code>B_GSM</code>) does not match the actual CDF variable name (<code>B_GSM_c</code>)</span>
+    </div>
+    <div class="issue-body">
+      <div class="field"><span class="field-label">File</span><span class="field-value"><code>cases/galaxy-15/case.json</code> line 43 · <code>fetch_galaxy15.py</code> line 49</span></div>
+      <div class="field"><span class="field-label">Problem</span><span class="field-value"><code>case.json</code> lists <code>"variable": "B_GSM"</code> for the magnetometer dataset. The fetch script uses <code>"variable": "B_GSM_c"</code>, which is the actual CDF variable name (the <code>_c</code> suffix denotes the corrected 3-component field). The provenance metadata in the API therefore outputs <code>B_GSM</code> for every MAG record, which does not match the source CDF variable.</span></div>
+      <div class="field"><span class="field-label">Why it matters</span><span class="field-value">The variable name is the traceability link back to the source instrument channel. <code>B_GSM</code> would refer to an uncorrected or non-existent field; the actual data is the 3-component <code>B_GSM_c</code> from which |B| is derived. Tests in <code>evidenceModel.test.js</code> line 90 hard-assert <code>'B_GSM'</code>, locking in the incorrect name.</span></div>
+      <div class="fix-box"><span class="fix-label">Recommended fix</span>Update <code>case.json</code> line 43 to <code>"variable": "B_GSM_c"</code> (or the appropriate scalar derived-field name). Update <code>evidenceModel.test.js</code> line 90. Also clarify in the description that the stored value is |B| (L2 norm of the 3-component vector), not a direct scalar measurement.</div>
+    </div>
+  </div>
+
+  
+  <div class="issue" id="H4">
+    <div class="issue-header">
+      <span class="badge badge-HIGH">HIGH</span>
+      <span class="id-badge">H4</span>
+      <span class="issue-title">XYZ_GSM variable in case.json is incorrect — the ephemeris source provides RADIUS (radial distance), not position vector</span>
+    </div>
+    <div class="issue-body">
+      <div class="field"><span class="field-label">File</span><span class="field-value"><code>cases/galaxy-15/case.json</code> lines 50–53 · <code>fetch_galaxy15.py</code> lines 56–64</span></div>
+      <div class="field"><span class="field-label">Problem</span><span class="field-value"><code>case.json</code> declares <code>"variable": "XYZ_GSM"</code> and <code>"measurement": "position"</code> with <code>"unit": "Re"</code> for the ephemeris dataset. The fetch script actually requests the <code>RADIUS</code> variable (scalar radial distance in Earth Radii), not a GSM position vector. The CSV values (~6.61 Re) confirm this is a scalar radial distance. There is no X/Y/Z decomposition in the data.</span></div>
+      <div class="field"><span class="field-label">Why it matters</span><span class="field-value">A user reading the metadata would expect 3D position coordinates (allowing longitude/latitude inference), but the actual data is only radial distance. This affects what scientific questions can be answered from the data (e.g. longitude drift cannot be assessed). The measurement description "position" in the CSV also overstates what was retrieved.</span></div>
+      <div class="fix-box"><span class="fix-label">Recommended fix</span>Update <code>case.json</code>: <code>"variable": "RADIUS"</code>, <code>"measurement": "radial_distance"</code>, <code>"description"</code> should read "GOES-11 radial distance from Earth center in Re (scalar)." Update the fetch script comment accordingly. Update <code>evidenceModel.test.js</code> line 105 to assert <code>'RADIUS'</code>.</div>
+    </div>
+  </div>
+
+  
+  <div class="issue" id="H5">
+    <div class="issue-header">
+      <span class="badge badge-HIGH">HIGH</span>
+      <span class="id-badge">H5</span>
+      <span class="issue-title">HW-C1 claim states "physical hardware destruction is ruled out" — this is a causal-certainty overstatement</span>
+    </div>
+    <div class="issue-body">
+      <div class="field"><span class="field-label">File</span><span class="field-value"><code>backend/services/aiEngine.js</code> lines 258–263</span></div>
+      <div class="field"><span class="field-label">Problem</span><span class="field-value">Claim <code>HW-C1</code> reasoning states: <em>"Physical hardware destruction is ruled out by the autonomous reboot."</em> This is deterministic causal language for what is an inference. The autonomous recovery demonstrates that a full power cycle or watchdog reset could restore nominal command processing — but this is consistent with multiple failure modes (latch-up recovery, firmware corruption, power anomaly). It does not rule out partial hardware degradation. Additionally, the claim <code>uncertainty</code> is set to <code>'observed'</code> when the inference that the recovery "rules out" destruction is clearly <code>'inferred'</code>.</span></div>
+      <div class="field"><span class="field-label">Why it matters</span><span class="field-value">The <code>CAUSAL_CERTAINTY_PHRASES</code> list in <code>aiEngine.js</code> line 446 contains "Physical hardware destruction is ruled out" — but only checks LLM outputs through <code>validatePass1Response</code>. The hardcoded heuristic bypasses this validator entirely, so this phrase appears in final API responses unchecked.</span></div>
+      <div class="fix-box"><span class="fix-label">Recommended fix</span>Rewrite reasoning to: "Autonomous recovery is inconsistent with permanent physical hardware destruction; however, it does not rule out transient hardware failure, latch-up, or firmware corruption." Change <code>uncertainty</code> from <code>'observed'</code> to <code>'inferred'</code>. The <code>relationship</code> should be <code>'non_discriminating'</code> (not <code>'contradicts'</code>) for the hardware failure hypothesis.</div>
+    </div>
+  </div>
+
+  
+  <div class="issue" id="H6">
+    <div class="issue-header">
+      <span class="badge badge-HIGH">HIGH</span>
+      <span class="id-badge">H6</span>
+      <span class="issue-title">Red-team heuristic summary hardcodes ESD language regardless of which hypothesis is being challenged</span>
+    </div>
+    <div class="issue-body">
+      <div class="field"><span class="field-label">File</span><span class="field-value"><code>backend/services/aiEngine.js</code> lines 810–816</span></div>
+      <div class="field"><span class="field-label">Problem</span><span class="field-value">The <code>redTeamSummary</code> fallback string (lines 810–816) always mentions "surface-charging sensor," "ESD inference," and "attitude disturbance" — language specific to the ESD hypothesis. This text is served even when <code>leadingHypothesisId</code> is <code>'single_event_upset'</code> or <code>'hardware_failure'</code>. The challenges array in <code>challengeMap</code> is hypothesis-specific (line 435), but the summary narrative is not.</span></div>
+      <div class="field"><span class="field-label">Why it matters</span><span class="field-value">A red-team summary for SEU that references "no onboard surface-charging sensor" and "ESD inference" is factually misattributed. It renders the summary scientifically incoherent when the leading hypothesis is not ESD.</span></div>
+      <div class="fix-box"><span class="fix-label">Recommended fix</span>Make <code>redTeamSummary</code> a lookup map keyed by <code>hypothesisId</code>, with distinct summary text for each hypothesis (ESD, SEU, hardware_failure, and a generic fallback for any unrecognised ID).</div>
+    </div>
+  </div>
+
+  
+  <div class="issue" id="H7">
+    <div class="issue-header">
+      <span class="badge badge-HIGH">HIGH</span>
+      <span class="id-badge">H7</span>
+      <span class="issue-title">HW-C1 Pass-2 challenge states hardware failure is "definitively ruled out" — explicit causal certainty</span>
+    </div>
+    <div class="issue-body">
+      <div class="field"><span class="field-label">File</span><span class="field-value"><code>backend/services/aiEngine.js</code> lines 415–420</span></div>
+      <div class="field"><span class="field-label">Problem</span><span class="field-value">The challenge for <code>HW-C1</code> states: <em>"Autonomous reboot and full recovery on 26 Dec 2010 definitively rules out permanent physical hardware destruction. This directly contradicts the hardware failure hypothesis."</em> The word "definitively" and the claim that this "directly contradicts" the entire hardware failure hypothesis are overstatements. Transient hardware failure is a valid sub-mode not excluded by recovery. The <code>revised_assessment</code> on line 419 says "Physical hardware destruction is eliminated" — another absolute statement.</span></div>
+      <div class="field"><span class="field-label">Why it matters</span><span class="field-value">This bypasses the <code>CAUSAL_CERTAINTY_PHRASES</code> validator (which is only applied to LLM outputs) and emits certainty language from the heuristic path that would be rejected by the same validator if an LLM produced it.</span></div>
+      <div class="fix-box"><span class="fix-label">Recommended fix</span>Rewrite to: "Autonomous recovery argues strongly against permanent hardware destruction but does not eliminate transient hardware-level failure. The hardware failure hypothesis should be narrowed to recoverable failure modes." Apply the <code>containsCausalCertainty</code> check to heuristic outputs as well as LLM outputs.</div>
+    </div>
+  </div>
+
+  
+  <h2>Medium</h2>
+
+  
+  <div class="issue" id="M1">
+    <div class="issue-header">
+      <span class="badge badge-MEDIUM">MEDIUM</span>
+      <span class="id-badge">M1</span>
+      <span class="issue-title"><code>ELEVATED_FLUX_THRESHOLD = 1000</code> is an arbitrary constant presented as a scientific threshold</span>
+    </div>
+    <div class="issue-body">
+      <div class="field"><span class="field-label">File</span><span class="field-value"><code>backend/services/aiEngine.js</code> line 30 · referenced in claim text at line 196</span></div>
+      <div class="field"><span class="field-label">Problem</span><span class="field-value">The 1000 p/cm²/s/sr threshold is used to count "elevated flux readings" which directly drives the <code>esdScore</code> computation (+15 if ≥5 readings above threshold). This value has no documented derivation from spacecraft charging standards (e.g. ECSS-E-ST-20-06 or MIL-HDBK-1541). It is not cross-referenced to any published spacecraft charging threshold for the Star-2 bus.</span></div>
+      <div class="field"><span class="field-label">Why it matters</span><span class="field-value">Using an uncalibrated threshold to count "elevated" flux readings and then using those counts to increment a score that produces a hypothesis ranking gives the appearance of a scientific criterion where there is none.</span></div>
+      <div class="fix-box"><span class="fix-label">Recommended fix</span>Document the threshold as an MVP heuristic (add a comment like <code>// HEURISTIC: no published spacecraft-specific charging threshold; this value is an analysis convention</code>). In claim text, replace "&gt; 1000 p/cm²/s/sr" with "above the heuristic investigation threshold" and surface the threshold value and its non-calibrated status in the claim's <code>reasoning</code> field.</div>
+    </div>
+  </div>
+
+  
+  <div class="issue" id="M2">
+    <div class="issue-header">
+      <span class="badge badge-MEDIUM">MEDIUM</span>
+      <span class="id-badge">M2</span>
+      <span class="issue-title">SEU-C3 claim: "Transponders remained operational" used to contradict SEU — this is an inference, not an observation</span>
+    </div>
+    <div class="issue-body">
+      <div class="field"><span class="field-label">File</span><span class="field-value"><code>backend/services/aiEngine.js</code> lines 243–251</span></div>
+      <div class="field"><span class="field-label">Problem</span><span class="field-value">Claim <code>SEU-C3</code> cites the <code>CASE</code> anchor event (which documents "transponders active") to <code>contradict</code> SEU. The reasoning says "A total SEU of the command processor would typically propagate to additional subsystems." The word "typically" is an unjustified engineering assumption not derived from any cited literature or dataset. It also conflates "total SEU" with all forms of SEU — a single-register upset in the command decoder would not be expected to propagate to the transmitter chain.</span></div>
+      <div class="field"><span class="field-label">Why it matters</span><span class="field-value">Labelling this claim <code>contradicts</code> on the basis of an undocumented "typically" assumption causes the SEU hypothesis to appear better-contradicted than the evidence supports. The uncertainty should be <code>'inferred'</code>, not <code>'observed'</code>.</span></div>
+      <div class="fix-box"><span class="fix-label">Recommended fix</span>Change <code>relationship</code> to <code>'non_discriminating'</code>, change <code>uncertainty</code> to <code>'inferred'</code>, and rewrite reasoning to acknowledge that operational transponders constrain only spacecraft-wide SEU, not a register-level upset in the command subsystem.</div>
+    </div>
+  </div>
+
+  
+  <div class="issue" id="M3">
+    <div class="issue-header">
+      <span class="badge badge-MEDIUM">MEDIUM</span>
+      <span class="id-badge">M3</span>
+      <span class="issue-title">ESD-C2 temporal claim ("~21 minutes") uses a hardcoded reference time that is not documented or justified</span>
+    </div>
+    <div class="issue-body">
+      <div class="field"><span class="field-label">File</span><span class="field-value"><code>backend/services/aiEngine.js</code> lines 51–58, 204–211</span></div>
+      <div class="field"><span class="field-label">Problem</span><span class="field-value">The code targets <code>2010-04-05T09:27:00Z</code> as a "spike window" (line 51), finds the nearest EP8 reading, then claim <code>ESD-C2</code> states "An electron flux reading near the 09:27 UTC spike window precedes the anomaly by ~21 minutes." The 09:27 reference time is hardcoded with no documented rationale in comments or in <code>case.json</code>. Is this from a published analysis? A visual inspection? An arbitrary choice?</span></div>
+      <div class="field"><span class="field-label">Why it matters</span><span class="field-value">An undocumented reference time can create a claim that appears to reference a known scientific observation (a published flux spike) but is actually just the result of a hardcoded constant. If the ~09:27 spike is from published literature, it should be cited; if it is empirically derived from the data, the derivation method should be documented.</span></div>
+      <div class="fix-box"><span class="fix-label">Recommended fix</span>Remove the hardcoded target time and instead compute the "nearest elevated EP8 reading before the anomaly" algorithmically. Document the 09:27 reference in a comment citing the source (or remove the magic constant entirely).</div>
+    </div>
+  </div>
+
+  
+  <div class="issue" id="M4">
+    <div class="issue-header">
+      <span class="badge badge-MEDIUM">MEDIUM</span>
+      <span class="id-badge">M4</span>
+      <span class="issue-title">B_GSM is stored as a scalar (|B|) but the variable in case.json implies a vector measurement</span>
+    </div>
+    <div class="issue-body">
+      <div class="field"><span class="field-label">File</span><span class="field-value"><code>cases/galaxy-15/case.json</code> lines 41–43 · <code>fetch_galaxy15.py</code> lines 54–55</span></div>
+      <div class="field"><span class="field-label">Problem</span><span class="field-value">The fetch script computes |B| (L2 norm of Bx, By, Bz) and stores a scalar. The measurement name <code>b_gsm</code> and variable name <code>B_GSM</code> / <code>B_GSM_c</code> both imply a vector in GSM coordinates. The individual components (relevant for determining field orientation, which affects particle access and spacecraft charging geometry) are discarded. This is not disclosed in <code>case.json</code>'s <code>scientific_limitations</code>.</span></div>
+      <div class="field"><span class="field-label">Why it matters</span><span class="field-value">A forensic analyst reading the evidence CSV would assume they are looking at a vector field magnitude that preserves directional information. The loss of Bx/By/Bz means that key physical quantities (e.g., Bz &lt; 0 conditions that enhance geomagnetic storm access to GEO) cannot be reconstructed from the stored evidence.</span></div>
+      <div class="fix-box"><span class="fix-label">Recommended fix</span>Add to <code>scientific_limitations</code>: "Only the total field magnitude |B| is stored; individual GSM components Bx, By, Bz were discarded during normalisation. Southward Bz conditions (relevant to geomagnetic storm enhancement) cannot be assessed from this data." Change the measurement name to <code>b_magnitude</code> or <code>b_gsm_total</code>.</div>
+    </div>
+  </div>
+
+  
+  <div class="issue" id="M5">
+    <div class="issue-header">
+      <span class="badge badge-MEDIUM">MEDIUM</span>
+      <span class="id-badge">M5</span>
+      <span class="issue-title">UI hardcodes anchor event timestamp as "09:48:00 UTC" rather than reading it from <code>caseMeta</code></span>
+    </div>
+    <div class="issue-body">
+      <div class="field"><span class="field-label">File</span><span class="field-value"><code>frontend/src/App.jsx</code> line 148 · <code>frontend/src/components/EventTimeline.jsx</code> line 50</span></div>
+      <div class="field"><span class="field-label">Problem</span><span class="field-value">In <code>App.jsx</code>, the Case Metadata card hardcodes <code>&lt;dd className="text-amber-400"&gt;09:48:00 UTC&lt;/dd&gt;</code> for the Anchor Event field instead of deriving it from <code>caseMeta.anchor_event.timestamp</code>. <code>EventTimeline.jsx</code> line 50 has a fallback: <code>anchorTimestamp ? formatTime(anchorTimestamp) : "09:48:00"</code> — the hardcoded fallback is acceptable as a defensive default, but the <code>App.jsx</code> hardcoding is not conditional.</span></div>
+      <div class="field"><span class="field-label">Why it matters</span><span class="field-value">If the anchor event timestamp in <code>case.json</code> is corrected or refined, the UI will continue to display the wrong time. This is also an inconsistency between the API-served data and the displayed data.</span></div>
+      <div class="fix-box"><span class="fix-label">Recommended fix</span>Replace the hardcoded string on line 148 of <code>App.jsx</code> with <code>{caseMeta.anchor_event?.timestamp?.slice(11,19)} UTC</code>.</div>
+    </div>
+  </div>
+
+  
+  <div class="issue" id="M6">
+    <div class="issue-header">
+      <span class="badge badge-MEDIUM">MEDIUM</span>
+      <span class="id-badge">M6</span>
+      <span class="issue-title">Pass 1 prompt allows LLM to return only 3 hypotheses; H3 (command-chain fault) and H4 (ground segment) are absent from the AI pass</span>
+    </div>
+    <div class="issue-body">
+      <div class="field"><span class="field-label">File</span><span class="field-value"><code>backend/services/aiEngine.js</code> lines 566–641 (prompt schema) · line 612</span></div>
+      <div class="field"><span class="field-label">Problem</span><span class="field-value">The Pass 1 prompt schema constrains <code>hypothesis_id</code> to <code>&lt;surface_charging_esd | single_event_upset | hardware_failure&gt;</code>. The deterministic path in <code>buildEvidenceGraph</code> returns five hypotheses (H1–H5), including H3 (command-receiver fault) and H4 (ground-segment anomaly). The AI pass and the evidence graph use different hypothesis sets, creating inconsistency between the two main output surfaces.</span></div>
+      <div class="field"><span class="field-label">Why it matters</span><span class="field-value">H3 and H4 represent hypotheses that are not discriminated by the available environmental data — which is a scientifically important conclusion. Omitting them from the AI analysis means the system effectively excludes them from consideration when the LLM runs, understating the uncertainty of the investigation.</span></div>
+      <div class="fix-box"><span class="fix-label">Recommended fix</span>Expand the prompt schema to include all five hypothesis IDs. At minimum, add an instruction that the LLM must include a note that ground-segment and command-chain hypotheses cannot be evaluated from the available data and should be marked <code>insufficient_evidence</code>.</div>
+    </div>
+  </div>
+
+  
+  <div class="issue" id="M7">
+    <div class="issue-header">
+      <span class="badge badge-MEDIUM">MEDIUM</span>
+      <span class="id-badge">M7</span>
+      <span class="issue-title">Evidence graph test T7 hard-asserts H5 has assessment <code>strongly_supported</code> — this bakes in a scientific conclusion</span>
+    </div>
+    <div class="issue-body">
+      <div class="field"><span class="field-label">File</span><span class="field-value"><code>backend/tests/evidenceGraph.test.js</code> lines 151–155</span></div>
+      <div class="field"><span class="field-label">Problem</span><span class="field-value">Test T7 asserts: <code>expect(H5.assessment).toBe('strongly_supported')</code>. H5 is "Insufficient evidence for causal attribution." Labelling the insufficiency-of-evidence conclusion as <code>strongly_supported</code> is philosophically circular: it means the system is "strongly supporting" the claim that nothing can be concluded. While this may be the intended epistemological framing, it is a hardcoded scientific judgment encoded in a test that will prevent any change to H5's assessment without breaking the test suite.</span></div>
+      <div class="field"><span class="field-label">Why it matters</span><span class="field-value">Tests encode assumptions that become implicit axioms. If the evidence base grows (e.g. telemetry is added) and H5 should become <code>weakly_supported</code> or <code>mixed</code>, this test would block that change.</span></div>
+      <div class="fix-box"><span class="fix-label">Recommended fix</span>Change the assertion to: <code>expect(ALLOWED.has(H5.assessment)).toBe(true)</code> (vocabulary conformance) and add a comment explaining why <code>strongly_supported</code> is the current expected value for the baseline dataset.</div>
+    </div>
+  </div>
+
+  
+  <h2>Low</h2>
+
+  
+  <div class="issue" id="L1">
+    <div class="issue-header">
+      <span class="badge badge-LOW">LOW</span>
+      <span class="id-badge">L1</span>
+      <span class="issue-title"><code>longitude_deg_west</code> is −133.0 but Galaxy 15 was stationed at 133° W (positive west value is conventional)</span>
+    </div>
+    <div class="issue-body">
+      <div class="field"><span class="field-label">File</span><span class="field-value"><code>cases/galaxy-15/case.json</code> line 21</span></div>
+      <div class="field"><span class="field-label">Problem</span><span class="field-value">The field is named <code>longitude_deg_west</code>, implying a positive-west convention (standard for GEO slot designations, e.g. "133° W"). The value stored is <code>-133.0</code> — which doubles the sign: "negative degrees west" = east. The correct value under a positive-west convention is <code>133.0</code>. If the intent is to use the eastern-longitude convention (degrees east of Greenwich), the field should be renamed <code>longitude_deg_east</code> and the value would be <code>-133.0</code> = <code>227.0°E</code>.</span></div>
+      <div class="field"><span class="field-label">Why it matters</span><span class="field-value">The UI <code>ReportModal.jsx</code> line 79 renders <code>{asset.longitude_deg_west}° W</code>, producing the display "−133.0° W" which is doubly wrong in both sign and convention.</span></div>
+      <div class="fix-box"><span class="fix-label">Recommended fix</span>Change to <code>"longitude_deg_west": 133.0</code> under the positive-west convention used by satellite operators, matching the NORAD/industry designation "Galaxy 15 at 133° W."</div>
+    </div>
+  </div>
+
+  
+  <div class="issue" id="L2">
+    <div class="issue-header">
+      <span class="badge badge-LOW">LOW</span>
+      <span class="id-badge">L2</span>
+      <span class="issue-title">Recovery event timestamp uses midnight UTC with no time precision; duration calculation is imprecise</span>
+    </div>
+    <div class="issue-body">
+      <div class="field"><span class="field-label">File</span><span class="field-value"><code>cases/galaxy-15/case.json</code> lines 11–15</span></div>
+      <div class="field"><span class="field-label">Problem</span><span class="field-value">The <code>recovery_event</code> timestamp is <code>"2010-12-26T00:00:00Z"</code>. Published accounts (IEEE/AIAA papers, Intelsat briefings) record the autonomous recovery of Galaxy 15 on or around 26 December 2010, but the exact time is not publicly documented to second precision. Using <code>T00:00:00Z</code> implies UTC midnight, which is likely a placeholder. The <code>description</code> notes "Duration of the anomaly is derived from anchor_event and recovery_event timestamps" — any derived duration carries the same imprecision.</span></div>
+      <div class="field"><span class="field-label">Why it matters</span><span class="field-value">A calculated duration of "~264 days" is reasonable; computing it from a midnight placeholder and then quoting it authoritatively would be misleading precision.</span></div>
+      <div class="fix-box"><span class="fix-label">Recommended fix</span>Add a note to the <code>recovery_event</code> description: "Exact recovery time is not publicly documented; this timestamp is a date-only placeholder (T00:00:00Z). Duration calculations carry corresponding uncertainty." Alternatively truncate to <code>"2010-12-26"</code> format to signal date-only resolution.</div>
+    </div>
+  </div>
+
+  
+  <div class="issue" id="L3">
+    <div class="issue-header">
+      <span class="badge badge-LOW">LOW</span>
+      <span class="id-badge">L3</span>
+      <span class="issue-title">Red-team challenge ESD-C3 (attitude disturbance) cites the anchor event as counter-evidence, but the anchor event does not contain attitude data</span>
+    </div>
+    <div class="issue-body">
+      <div class="field"><span class="field-label">File</span><span class="field-value"><code>backend/services/aiEngine.js</code> lines 368–376</span></div>
+      <div class="field"><span class="field-label">Problem</span><span class="field-value">Challenge <code>ESD-C3</code> cites <code>anchorIds</code> as <code>counter_evidence_ids</code> for the argument that "nominal attitude control is a missing signature for ESD." The anchor event records only command-contact loss (<code>galaxy15_anomaly = 1</code>). It contains no attitude data whatsoever. The challenge correctly identifies that nominal attitude is a missing ESD signature, but then cites evidence that does not support that point.</span></div>
+      <div class="field"><span class="field-label">Why it matters</span><span class="field-value">Citing the anchor event as counter-evidence for attitude behavior constitutes evidence used outside its measurement scope — the exact flaw the system's own red-team pattern #3 is designed to detect.</span></div>
+      <div class="fix-box"><span class="fix-label">Recommended fix</span>Set <code>counter_evidence_ids: []</code> for challenge ESD-C3 (there is no attitude evidence in the dataset). Add "Spacecraft attitude data" explicitly to the <code>missing_evidence</code> array.</div>
+    </div>
+  </div>
+
+  
+  <div class="issue" id="L4">
+    <div class="issue-header">
+      <span class="badge badge-LOW">LOW</span>
+      <span class="id-badge">L4</span>
+      <span class="issue-title"><code>assessmentToScore</code> map does not include <code>'mixed'</code> — LLM-returned mixed hypotheses fall back to confidence 50</span>
+    </div>
+    <div class="issue-body">
+      <div class="field"><span class="field-label">File</span><span class="field-value"><code>backend/services/aiEngine.js</code> lines 733–739</span></div>
+      <div class="field"><span class="field-label">Problem</span><span class="field-value">The <code>assessmentToScore</code> map used by the LLM path contains: <code>strongly_supported: 85, supported: 72, mixed: 55, weakly_supported: 45, insufficient_evidence: 25</code>. Wait — <code>mixed</code> is actually present. However, <code>ALLOWED_ASSESSMENTS</code> (line 441) also includes <code>'mixed'</code> but the heuristic <code>scoreToAssessment</code> (line 159) never returns <code>'mixed'</code>: it maps ≥70→<code>'supported'</code>, ≥50→<code>'weakly_supported'</code>, else <code>'insufficient_evidence'</code>. The assessment vocabulary is inconsistent between the LLM and heuristic paths: the heuristic cannot produce <code>'mixed'</code> or <code>'strongly_supported'</code>.</span></div>
+      <div class="field"><span class="field-label">Why it matters</span><span class="field-value">The two code paths (LLM and heuristic) have semantically different assessment ranges, meaning the meaning of "supported" differs. The evidence graph uses yet another set (H1 and H2 are both "mixed"). Three different assessment vocabularies in the same system erodes semantic consistency.</span></div>
+      <div class="fix-box"><span class="fix-label">Recommended fix</span>Align <code>scoreToAssessment</code> to the full 5-tier vocabulary. Document explicit score-to-assessment mappings and apply them consistently. Consider removing the heuristic score entirely (see C2).</div>
+    </div>
+  </div>
+
+  
+  <h2>Cross-Cutting Observations</h2>
+
+  <div style="background:#f7f8fa;border:1px solid #e5e7eb;border-radius:8px;padding:16px 20px;font-size:13px;line-height:1.7">
+    <p style="margin-bottom:10px"><strong>Positive findings:</strong> The following areas were audited and found to be scientifically sound:</p>
+    <ul style="padding-left:20px;margin-bottom:14px">
+      <li><code>case.json → causal_attribution</code> correctly states attribution is not established (line 5).</li>
+      <li><code>scientific_limitations</code> array in case.json explicitly discloses proxy measurement distance (~2° separation), 5-min averaging, absence of Galaxy 15 magnetometer, and fill-value handling.</li>
+      <li>The <code>CAUSAL_CERTAINTY_PHRASES</code> validator in aiEngine.js is well-designed and covers the most common over-claim patterns.</li>
+      <li>Evidence IDs are deterministically assigned and traceable via the evidence_id → CSV row link.</li>
+      <li>Fill-value exclusion (<code>FILL_ABS_THRESHOLD</code>) is correctly applied; no −1E31 sentinels appear in the normalised CSV.</li>
+      <li>H3 (command-chain fault) and H4 (ground-segment) are appropriately represented in the evidence graph with <code>insufficient_evidence</code> assessments and missing-data limitations.</li>
+      <li>All test suites correctly verify provenance round-tripping, hallucination rejection, and evidence ID uniqueness.</li>
+      <li>Proxy-vs-direct measurement distinction is clearly labelled in limitations and claim reasoning throughout.</li>
+    </ul>
+    <p><strong>Architecture gap:</strong> The <code>validatePass1Response</code> / <code>validatePass2Response</code> validators are applied only to LLM output. The deterministic heuristic path is not passed through the same validators, meaning causal-certainty phrases and vocabulary violations in heuristic output are never caught at runtime (issues H5, H7).</p>
+  </div>
+
+</div>
+
+<footer>Made with IBM Bob</footer>
+</body>
+</html>

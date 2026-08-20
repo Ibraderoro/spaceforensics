@@ -1,0 +1,67 @@
+{
+  "case_id": "galaxy-15",
+  "title": "Galaxy 15 Satellite Anomaly — April 2010",
+  "description": "On 2010-04-05T09:48:00Z, Galaxy 15 became unresponsive to ground commands. The anomaly occurred during disturbed geomagnetic and energetic-particle conditions. The spacecraft continued transmitting and remained otherwise operational. The role of the space environment in producing the anomaly is an open investigation question.",
+  "causal_attribution": "Causal attribution is not established by the available evidence.",
+  "anchor_event": {
+    "timestamp": "2010-04-05T09:48:00Z",
+    "label": "galaxy15_anomaly",
+    "description": "Last successful ground command contact lost. Satellite entered 'zombiesat' state — transponders active, attitude control nominal, command uplink unresponsive."
+  },
+  "recovery_event": {
+    "timestamp": "2010-12-26T00:00:00Z",
+    "label": "autonomous_recovery",
+    "description": "Galaxy 15 autonomously resumed responding to ground commands. Duration of the anomaly is derived from anchor_event and recovery_event timestamps."
+  },
+  "target_asset": {
+    "name": "Galaxy 15",
+    "alias": "G-15",
+    "norad_id": 28884,
+    "orbit_type": "GEO",
+    "longitude_deg_west": -133.0,
+    "operator": "Intelsat",
+    "spacecraft_bus": "Star-2 (Orbital Sciences)"
+  },
+  "data_window": {
+    "start": "2010-04-05T08:00:00Z",
+    "end": "2010-04-05T11:00:00Z",
+    "duration_minutes": 180
+  },
+  "data_sources": [
+    {
+      "dataset_id": "GOES11_K0_EP8",
+      "description": "GOES-11 Energetic Particle Sensor — 5-minute averaged electron and proton flux",
+      "variable": "E_1MEV_IC",
+      "measurement": "e_flux",
+      "unit": "particles/cm2/s/sr",
+      "resolution": "5min",
+      "provider": "NASA CDAWeb"
+    },
+    {
+      "dataset_id": "GOES11_K0_MAG",
+      "description": "GOES-11 Magnetometer — 1-minute averaged magnetic field in GSM coordinates",
+      "variable": "B_GSM",
+      "measurement": "b_gsm",
+      "unit": "nT",
+      "resolution": "1min",
+      "provider": "NASA CDAWeb"
+    },
+    {
+      "dataset_id": "GOES11_EPHEMERIS_SSC",
+      "description": "GOES-11 Orbit Ephemeris from SSC — 3-minute position in GSM coordinates",
+      "variable": "XYZ_GSM",
+      "measurement": "position",
+      "unit": "Re",
+      "resolution": "3min",
+      "provider": "NASA CDAWeb / SSC"
+    }
+  ],
+  "scientific_limitations": [
+    "GOES-11 was at GEO longitude -135.0° W, approximately 2° from Galaxy 15 at -133.0° W. Particle and field measurements are a proxy, not a direct in-situ sample at the satellite bus.",
+    "The 5-minute averaging of EP8 particle flux data smooths sub-minute impulsive flux increases that may have caused single-event upsets.",
+    "B_GSM is the local field at GOES-11 orbit, not at the Galaxy 15 spacecraft body. No magnetometer was onboard Galaxy 15.",
+    "Causation between the space weather environment and the command anomaly is inferred, not established. Ground software and RF link conditions are not captured in this dataset.",
+    "CDAWeb fill values (-1.0E31) indicate data gaps in the Level-2 archive and are removed from the evidence CSV.",
+    "GOES-11 ephemeris from SSC is reconstructed orbit data and may differ by tens of kilometres from the real-time position."
+  ]
+}

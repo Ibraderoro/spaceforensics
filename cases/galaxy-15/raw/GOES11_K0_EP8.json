@@ -1,0 +1,1351 @@
+{
+  "CDF": [
+    {
+      "name": "goes11_k0s_ep8_20100405080230_20100405105730_cdaweb.cdf",
+      "cdfFileInfo": {
+        "fileFormat": "SINGLE",
+        "majority": "COLUMN",
+        "encoding": "NETWORK",
+        "negToPosFp0": "DISABLE"
+      },
+      "cdfGAttributes": {
+        "attribute": [
+          {
+            "name": "TITLE",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "NOAA/SEC GOES_11 CDF Energetic Particle Flux"
+              }
+            ]
+          },
+          {
+            "name": "Project",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "ISTP>InternationalSolar-Terrestrial Physics"
+              }
+            ]
+          },
+          {
+            "name": "Discipline",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Space Physics>Magnetospheric Science"
+              }
+            ]
+          },
+          {
+            "name": "Source_name",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "GOES_11>Geostationary Operational Environmental Satellite 11"
+              }
+            ]
+          },
+          {
+            "name": "Descriptor",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "EP8>Energetic Particle Sensor"
+              }
+            ]
+          },
+          {
+            "name": "Data_type",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "K0>Key Parameter"
+              }
+            ]
+          },
+          {
+            "name": "Data_version",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "3"
+              }
+            ]
+          },
+          {
+            "name": "TEXT",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "CDAWeb interface derived data on Thu Aug 20 00:38:34 EDT 2026."
+              },
+              {
+                "entryNum": 1,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Relevant metadata is carried over from the original data files to this newly created file. "
+              },
+              {
+                "entryNum": 2,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Contacts: Tami.J.Kovalick@nasa.gov, Rita.C.Johnson@nasa.gov."
+              },
+              {
+                "entryNum": 3,
+                "cdfDatatype": "CDF_CHAR",
+                "value": " "
+              },
+              {
+                "entryNum": 4,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "The NOAA Geostationary Operational"
+              },
+              {
+                "entryNum": 5,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Environmental Satellite (GOES) key"
+              },
+              {
+                "entryNum": 6,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "parameters are obtained from the"
+              },
+              {
+                "entryNum": 7,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Energetic Particle Sensor (EPS)"
+              },
+              {
+                "entryNum": 8,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "and the magnetometer (MAG).  The"
+              },
+              {
+                "entryNum": 9,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "key parameters are a subset of the"
+              },
+              {
+                "entryNum": 10,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "data available from the GOES Space"
+              },
+              {
+                "entryNum": 11,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Environment Monitor (SEM) instruments."
+              },
+              {
+                "entryNum": 12,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "The energetic particle fluxes are"
+              },
+              {
+                "entryNum": 13,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "given as five-minute averaged values"
+              },
+              {
+                "entryNum": 14,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "and the vector magnetic field is given"
+              },
+              {
+                "entryNum": 15,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "as one-minute average values."
+              },
+              {
+                "entryNum": 16,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Flux values for three integral electron"
+              },
+              {
+                "entryNum": 17,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "channels (E >0.6 MeV, E >2.0 MeV,"
+              },
+              {
+                "entryNum": 18,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "and E >4.0 MeV) and one differential"
+              },
+              {
+                "entryNum": 19,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "proton channel(0.7 MeV < E <4 MeV)"
+              },
+              {
+                "entryNum": 20,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "are provided. These data are used by"
+              },
+              {
+                "entryNum": 21,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "NOAA Space Environment Center (SEC)"
+              },
+              {
+                "entryNum": 22,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "for the real-time monitoring and"
+              },
+              {
+                "entryNum": 23,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "prediction of the conditions in the"
+              },
+              {
+                "entryNum": 24,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Earth's space environment.  A new"
+              },
+              {
+                "entryNum": 25,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "series of GOES spacecraft began"
+              },
+              {
+                "entryNum": 26,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "with GOES-8 launched on 4/13/94,"
+              },
+              {
+                "entryNum": 27,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "GOES-9 launched on 5/23/95,"
+              },
+              {
+                "entryNum": 28,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "GOES-10 launched on 4/25/97,"
+              },
+              {
+                "entryNum": 29,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "GOES-11 launched on 5/3/2000, and"
+              },
+              {
+                "entryNum": 30,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "GOES-12 launched on 7/23/2001."
+              },
+              {
+                "entryNum": 31,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Typically two satellites are maintained"
+              },
+              {
+                "entryNum": 32,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "operational,one at about 135 degrees"
+              },
+              {
+                "entryNum": 33,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "geographic west longitude and one at"
+              },
+              {
+                "entryNum": 34,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "about 75 degrees geographic west"
+              },
+              {
+                "entryNum": 35,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "longitude. The satellite inclination"
+              },
+              {
+                "entryNum": 36,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "is typically within a few tenths of a"
+              },
+              {
+                "entryNum": 37,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "degree of the geographic equator."
+              },
+              {
+                "entryNum": 38,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "However, the satellites can be moved,"
+              },
+              {
+                "entryNum": 39,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "especially during the six months to"
+              },
+              {
+                "entryNum": 40,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "one year following launch, and the"
+              },
+              {
+                "entryNum": 41,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "inclination can increase after years"
+              },
+              {
+                "entryNum": 42,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "of satellite operation."
+              },
+              {
+                "entryNum": 43,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Instrument data quality flags are set"
+              },
+              {
+                "entryNum": 44,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "from real-time telemetry, or, in"
+              },
+              {
+                "entryNum": 45,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "the case of historically-processed"
+              },
+              {
+                "entryNum": 46,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "data sets when telemetry is not"
+              },
+              {
+                "entryNum": 47,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "available, fixed to a level-1"
+              },
+              {
+                "entryNum": 48,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "instrument status flag for all data"
+              },
+              {
+                "entryNum": 49,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Reference: Geostationary Operational"
+              },
+              {
+                "entryNum": 50,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Environmental Satellite GOES I-M"
+              },
+              {
+                "entryNum": 51,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "System Description, compiled by John"
+              },
+              {
+                "entryNum": 52,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Savides, Space Systems/Loral, Palo"
+              },
+              {
+                "entryNum": 53,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Alto, California, December 1992."
+              },
+              {
+                "entryNum": 54,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Dr. Terrance Onsager, NOAA/SEC,"
+              },
+              {
+                "entryNum": 55,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Terry.Onsager@noaa.gov, 303-497-5713,"
+              },
+              {
+                "entryNum": 56,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "325 Broadway, Boulder CO 80305 USA,"
+              },
+              {
+                "entryNum": 57,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "or Ann Newman, NOAA/SEC,"
+              },
+              {
+                "entryNum": 58,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Ann.Newman@noaa.gov, 303-497-5100,"
+              },
+              {
+                "entryNum": 59,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "325 Broadway, Boulder CO 80305 USA"
+              }
+            ]
+          },
+          {
+            "name": "MODS",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Version 2.0: 1st operational version,-db, 14 Jul 92"
+              },
+              {
+                "entryNum": 1,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Corrected S/C location error & added Geographic (not geodetic) & GEO S/C positions.  -db, 16 Feb 93"
+              },
+              {
+                "entryNum": 2,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Added unit_ptr to s/c position units fixed CATDES on SC_pos_sm, fixed GSn   -db, 20 Apr 93"
+              },
+              {
+                "entryNum": 3,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Version 3.0: Major re-write, added  GOES-8 and GOES-9, -db 22 Feb 96."
+              },
+              {
+                "entryNum": 4,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Fixed 1-character xyz label problem,"
+              },
+              {
+                "entryNum": 5,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "-db, 8 May 96"
+              },
+              {
+                "entryNum": 6,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Minor text & label changes,"
+              },
+              {
+                "entryNum": 7,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "-db, 29 Jul 96"
+              },
+              {
+                "entryNum": 8,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Added global metadata, support_data  text, blank variable attrib. data  per Mona Kessel sample file, -db, 5 Aug 96"
+              },
+              {
+                "entryNum": 9,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Added xyz GEO,GSE,GSM labels,"
+              },
+              {
+                "entryNum": 10,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "replacing 1 cartesian label  -db, 29 Aug 96"
+              },
+              {
+                "entryNum": 11,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Create 1 skeleton table for EPS for all GOES  preparing for the switch from GOES-9 to 10  -anewman, 22 Jul 1998"
+              },
+              {
+                "entryNum": 12,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Added GOES-10 launch date and replaced Ann Newman with Martin Black as contact person. -mblack, 18 Mar 1999"
+              },
+              {
+                "entryNum": 13,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Changed Epoch and Time_PB5 VAR_TYPEs from data to support_data, and changed CATDESC values for position variables from s/c to GOES 11. for GSE and GSM mag field vectors. These changes were requested by Mona Kessel. -mblack, 12 Apr 1999"
+              },
+              {
+                "entryNum": 14,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Updated metadata with GOES-11 launch date and with a Logical_source value that includes the word GOES. This is in preparation of GOES-11 replacing GOES-10 as GOES West in late June, 2006 -anewman June 23, 2006"
+              }
+            ]
+          },
+          {
+            "name": "ADID_ref",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "NSSD0098"
+              }
+            ]
+          },
+          {
+            "name": "Logical_file_id",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "goes11_k0s_ep8_20100405080230_20100405105730_cdaweb"
+              }
+            ]
+          },
+          {
+            "name": "Logical_source",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "GOES11_K0S_EP8"
+              }
+            ]
+          },
+          {
+            "name": "Logical_source_description",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "DERIVED FROM: GOES 11 Energetic Particle Sensor, Key Parameters"
+              }
+            ]
+          },
+          {
+            "name": "PI_name",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "T. Onsager"
+              }
+            ]
+          },
+          {
+            "name": "PI_affiliation",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "NOAA SEC"
+              }
+            ]
+          },
+          {
+            "name": "Mission_group",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "GOES"
+              },
+              {
+                "entryNum": 1,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "!___Magnetospheric Data"
+              }
+            ]
+          },
+          {
+            "name": "Instrument_type",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Particles (space)"
+              }
+            ]
+          },
+          {
+            "name": "spase_DatasetResourceID",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "spase://NOAA/NumericalData/GOES/11/EPS/PT5M"
+              }
+            ]
+          },
+          {
+            "name": "CDAWEB_PARENTS",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "goes11_k0_ep8_00000000_v01"
+              },
+              {
+                "entryNum": 1,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "goes11_k0_ep8_20100405_v03"
+              }
+            ]
+          },
+          {
+            "name": "PARENTS",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "goes11_k0_ep8_00000000_v01"
+              },
+              {
+                "entryNum": 1,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "goes11_k0_ep8_20100405_v03"
+              }
+            ]
+          }
+        ]
+      },
+      "cdfVariables": {
+        "variable": [
+          {
+            "name": "Epoch",
+            "cdfVarInfo": {
+              "cdfDatatype": "CDF_EPOCH",
+              "dim": 0,
+              "numElements": 1,
+              "recVariance": "VARY",
+              "numRecordsAllocate": 36,
+              "padValue": "0000-01-01T00:00:00.000Z"
+            },
+            "cdfVAttributes": {
+              "attribute": [
+                {
+                  "name": "FIELDNAM",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_CHAR",
+                      "value": "Time"
+                    }
+                  ]
+                },
+                {
+                  "name": "VALIDMIN",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_DOUBLE",
+                      "value": "6.22934496E13"
+                    }
+                  ]
+                },
+                {
+                  "name": "VALIDMAX",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_DOUBLE",
+                      "value": "6.3461059199E13"
+                    }
+                  ]
+                },
+                {
+                  "name": "SCALEMIN",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_DOUBLE",
+                      "value": "6.28798464E13"
+                    }
+                  ]
+                },
+                {
+                  "name": "SCALEMAX",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_DOUBLE",
+                      "value": "6.3145526399E13"
+                    }
+                  ]
+                },
+                {
+                  "name": "LABLAXIS",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_CHAR",
+                      "value": "Epoch"
+                    }
+                  ]
+                },
+                {
+                  "name": "UNITS",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_CHAR",
+                      "value": "ms"
+                    }
+                  ]
+                },
+                {
+                  "name": "MONOTON",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_CHAR",
+                      "value": "INCREASE"
+                    }
+                  ]
+                },
+                {
+                  "name": "VAR_TYPE",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_CHAR",
+                      "value": "support_data"
+                    }
+                  ]
+                },
+                {
+                  "name": "FILLVAL",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_DOUBLE",
+                      "value": "-1.0E31"
+                    }
+                  ]
+                },
+                {
+                  "name": "CATDESC",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_CHAR",
+                      "value": "Time"
+                    }
+                  ]
+                },
+                {
+                  "name": "DIM_SIZES",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_INT4",
+                      "value": "0"
+                    }
+                  ]
+                }
+              ]
+            },
+            "cdfVarData": {
+              "record": [
+                {
+                  "recNum": 0,
+                  "value": [
+                    "2010-04-05T08:02:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 1,
+                  "value": [
+                    "2010-04-05T08:07:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 2,
+                  "value": [
+                    "2010-04-05T08:12:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 3,
+                  "value": [
+                    "2010-04-05T08:17:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 4,
+                  "value": [
+                    "2010-04-05T08:22:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 5,
+                  "value": [
+                    "2010-04-05T08:27:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 6,
+                  "value": [
+                    "2010-04-05T08:32:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 7,
+                  "value": [
+                    "2010-04-05T08:37:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 8,
+                  "value": [
+                    "2010-04-05T08:42:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 9,
+                  "value": [
+                    "2010-04-05T08:47:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 10,
+                  "value": [
+                    "2010-04-05T08:52:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 11,
+                  "value": [
+                    "2010-04-05T08:57:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 12,
+                  "value": [
+                    "2010-04-05T09:02:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 13,
+                  "value": [
+                    "2010-04-05T09:07:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 14,
+                  "value": [
+                    "2010-04-05T09:12:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 15,
+                  "value": [
+                    "2010-04-05T09:17:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 16,
+                  "value": [
+                    "2010-04-05T09:22:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 17,
+                  "value": [
+                    "2010-04-05T09:27:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 18,
+                  "value": [
+                    "2010-04-05T09:32:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 19,
+                  "value": [
+                    "2010-04-05T09:37:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 20,
+                  "value": [
+                    "2010-04-05T09:42:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 21,
+                  "value": [
+                    "2010-04-05T09:47:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 22,
+                  "value": [
+                    "2010-04-05T09:52:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 23,
+                  "value": [
+                    "2010-04-05T09:57:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 24,
+                  "value": [
+                    "2010-04-05T10:02:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 25,
+                  "value": [
+                    "2010-04-05T10:07:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 26,
+                  "value": [
+                    "2010-04-05T10:12:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 27,
+                  "value": [
+                    "2010-04-05T10:17:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 28,
+                  "value": [
+                    "2010-04-05T10:22:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 29,
+                  "value": [
+                    "2010-04-05T10:27:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 30,
+                  "value": [
+                    "2010-04-05T10:32:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 31,
+                  "value": [
+                    "2010-04-05T10:37:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 32,
+                  "value": [
+                    "2010-04-05T10:42:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 33,
+                  "value": [
+                    "2010-04-05T10:47:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 34,
+                  "value": [
+                    "2010-04-05T10:52:30.000Z"
+                  ]
+                },
+                {
+                  "recNum": 35,
+                  "value": [
+                    "2010-04-05T10:57:30.000Z"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "E2",
+            "cdfVarInfo": {
+              "cdfDatatype": "CDF_FLOAT",
+              "dim": 0,
+              "numElements": 1,
+              "recVariance": "VARY",
+              "compression": "GZIP.6",
+              "numRecordsAllocate": 36,
+              "padValue": "-1.0E30",
+              "blockingFactor": 16384
+            },
+            "cdfVAttributes": {
+              "attribute": [
+                {
+                  "name": "FIELDNAM",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_CHAR",
+                      "value": "Electron Flux (E2)"
+                    }
+                  ]
+                },
+                {
+                  "name": "VALIDMIN",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_FLOAT",
+                      "value": "0.0"
+                    }
+                  ]
+                },
+                {
+                  "name": "VALIDMAX",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_FLOAT",
+                      "value": "9.9999999E14"
+                    }
+                  ]
+                },
+                {
+                  "name": "SCALEMIN",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_FLOAT",
+                      "value": "1.0"
+                    }
+                  ]
+                },
+                {
+                  "name": "SCALEMAX",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_FLOAT",
+                      "value": "1000000.0"
+                    }
+                  ]
+                },
+                {
+                  "name": "LABLAXIS",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_CHAR",
+                      "value": "E2 (>2 MeV)"
+                    }
+                  ]
+                },
+                {
+                  "name": "UNITS",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_CHAR",
+                      "value": "e/(cm^2*s*sr)"
+                    }
+                  ]
+                },
+                {
+                  "name": "FORMAT",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_CHAR",
+                      "value": "E11.4"
+                    }
+                  ]
+                },
+                {
+                  "name": "MONOTON",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_CHAR",
+                      "value": "FALSE"
+                    }
+                  ]
+                },
+                {
+                  "name": "VAR_TYPE",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_CHAR",
+                      "value": "data"
+                    }
+                  ]
+                },
+                {
+                  "name": "FILLVAL",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_FLOAT",
+                      "value": "-1.0E31"
+                    }
+                  ]
+                },
+                {
+                  "name": "DEPEND_0",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_CHAR",
+                      "value": "Epoch"
+                    }
+                  ]
+                },
+                {
+                  "name": "CATDESC",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_CHAR",
+                      "value": "GOES Electron Flux (> 2 MeV)"
+                    }
+                  ]
+                },
+                {
+                  "name": "SCALETYP",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_CHAR",
+                      "value": "LOG"
+                    }
+                  ]
+                },
+                {
+                  "name": "DIM_SIZES",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_INT4",
+                      "value": "0"
+                    }
+                  ]
+                }
+              ]
+            },
+            "cdfVarData": {
+              "record": [
+                {
+                  "recNum": 0,
+                  "value": [
+                    "355.7844"
+                  ]
+                },
+                {
+                  "recNum": 1,
+                  "value": [
+                    "337.2367"
+                  ]
+                },
+                {
+                  "recNum": 2,
+                  "value": [
+                    "319.7376"
+                  ]
+                },
+                {
+                  "recNum": 3,
+                  "value": [
+                    "313.3776"
+                  ]
+                },
+                {
+                  "recNum": 4,
+                  "value": [
+                    "304.6586"
+                  ]
+                },
+                {
+                  "recNum": 5,
+                  "value": [
+                    "164.7909"
+                  ]
+                },
+                {
+                  "recNum": 6,
+                  "value": [
+                    "228.4679"
+                  ]
+                },
+                {
+                  "recNum": 7,
+                  "value": [
+                    "330.2275"
+                  ]
+                },
+                {
+                  "recNum": 8,
+                  "value": [
+                    "83.44197"
+                  ]
+                },
+                {
+                  "recNum": 9,
+                  "value": [
+                    "196.9078"
+                  ]
+                },
+                {
+                  "recNum": 10,
+                  "value": [
+                    "442.0811"
+                  ]
+                },
+                {
+                  "recNum": 11,
+                  "value": [
+                    "38.63533"
+                  ]
+                },
+                {
+                  "recNum": 12,
+                  "value": [
+                    "233.5661"
+                  ]
+                },
+                {
+                  "recNum": 13,
+                  "value": [
+                    "152.7701"
+                  ]
+                },
+                {
+                  "recNum": 14,
+                  "value": [
+                    "624.6141"
+                  ]
+                },
+                {
+                  "recNum": 15,
+                  "value": [
+                    "1022.733"
+                  ]
+                },
+                {
+                  "recNum": 16,
+                  "value": [
+                    "1847.503"
+                  ]
+                },
+                {
+                  "recNum": 17,
+                  "value": [
+                    "2999.722"
+                  ]
+                },
+                {
+                  "recNum": 18,
+                  "value": [
+                    "1439.167"
+                  ]
+                },
+                {
+                  "recNum": 19,
+                  "value": [
+                    "112.1664"
+                  ]
+                },
+                {
+                  "recNum": 20,
+                  "value": [
+                    "116.4381"
+                  ]
+                },
+                {
+                  "recNum": 21,
+                  "value": [
+                    "108.7257"
+                  ]
+                },
+                {
+                  "recNum": 22,
+                  "value": [
+                    "108.3452"
+                  ]
+                },
+                {
+                  "recNum": 23,
+                  "value": [
+                    "101.7469"
+                  ]
+                },
+                {
+                  "recNum": 24,
+                  "value": [
+                    "100.8926"
+                  ]
+                },
+                {
+                  "recNum": 25,
+                  "value": [
+                    "125.451"
+                  ]
+                },
+                {
+                  "recNum": 26,
+                  "value": [
+                    "235.5388"
+                  ]
+                },
+                {
+                  "recNum": 27,
+                  "value": [
+                    "703.3044"
+                  ]
+                },
+                {
+                  "recNum": 28,
+                  "value": [
+                    "482.1007"
+                  ]
+                },
+                {
+                  "recNum": 29,
+                  "value": [
+                    "344.9671"
+                  ]
+                },
+                {
+                  "recNum": 30,
+                  "value": [
+                    "228.3837"
+                  ]
+                },
+                {
+                  "recNum": 31,
+                  "value": [
+                    "228.2016"
+                  ]
+                },
+                {
+                  "recNum": 32,
+                  "value": [
+                    "125.4078"
+                  ]
+                },
+                {
+                  "recNum": 33,
+                  "value": [
+                    "95.62299"
+                  ]
+                },
+                {
+                  "recNum": 34,
+                  "value": [
+                    "142.0087"
+                  ]
+                },
+                {
+                  "recNum": 35,
+                  "value": [
+                    "84.05683"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "orphanAttributes": {
+        "attribute": [
+          {
+            "name": "DICT_KEY"
+          },
+          {
+            "name": "AVG_KEY"
+          },
+          {
+            "name": "LABL_PTR_1"
+          },
+          {
+            "name": "UNIT_PTR"
+          },
+          {
+            "name": "FORM_PTR"
+          },
+          {
+            "name": "DEPEND_1"
+          },
+          {
+            "name": "AVG_TYPE"
+          },
+          {
+            "name": "DISPLAY_TYPE"
+          },
+          {
+            "name": "VAR_NOTES"
+          }
+        ]
+      }
+    }
+  ],
+  "Message": [],
+  "Warning": [],
+  "Status": [],
+  "Error": []
+}

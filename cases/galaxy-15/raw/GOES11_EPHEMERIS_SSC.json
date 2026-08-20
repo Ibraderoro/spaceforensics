@@ -1,0 +1,1328 @@
+{
+  "CDF": [
+    {
+      "name": "goes11_ephemeriss_ssc_20100405080000_20100405110000_cdaweb.cdf",
+      "cdfFileInfo": {
+        "fileFormat": "SINGLE",
+        "majority": "COLUMN",
+        "encoding": "NETWORK",
+        "negToPosFp0": "DISABLE"
+      },
+      "cdfGAttributes": {
+        "attribute": [
+          {
+            "name": "TITLE",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "ISTP ORBIT CDF"
+              }
+            ]
+          },
+          {
+            "name": "Project",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "SSC"
+              }
+            ]
+          },
+          {
+            "name": "Discipline",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Space Physics"
+              }
+            ]
+          },
+          {
+            "name": "Source_name",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "GOES11"
+              }
+            ]
+          },
+          {
+            "name": "Data_version",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "1"
+              }
+            ]
+          },
+          {
+            "name": "ADID_ref",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "NSSD0110"
+              }
+            ]
+          },
+          {
+            "name": "Logical_file_id",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "goes11_ephemeriss_ssc_20100405080000_20100405110000_cdaweb"
+              }
+            ]
+          },
+          {
+            "name": "Data_type",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "OR>Orbit"
+              }
+            ]
+          },
+          {
+            "name": "Descriptor",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "SSC>SSC data"
+              }
+            ]
+          },
+          {
+            "name": "TEXT",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "CDAWeb interface derived data on Thu Aug 20 00:38:39 EDT 2026."
+              },
+              {
+                "entryNum": 1,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Relevant metadata is carried over from the original data files to this newly created file. "
+              },
+              {
+                "entryNum": 2,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Contacts: Tami.J.Kovalick@nasa.gov, Rita.C.Johnson@nasa.gov."
+              },
+              {
+                "entryNum": 3,
+                "cdfDatatype": "CDF_CHAR",
+                "value": " "
+              },
+              {
+                "entryNum": 4,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Data quantities are generated fromt the SSCWeb system"
+              }
+            ]
+          },
+          {
+            "name": "MODS",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "None planned"
+              }
+            ]
+          },
+          {
+            "name": "Logical_source",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "GOES11_EPHEMERISS_SSC"
+              }
+            ]
+          },
+          {
+            "name": "Logical_source_description",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "DERIVED FROM: GOES11 Ephemeris data from the SSCWeb system"
+              }
+            ]
+          },
+          {
+            "name": "PI_name",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "SPDF"
+              }
+            ]
+          },
+          {
+            "name": "PI_affiliation",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Goddard Space Flight Center"
+              }
+            ]
+          },
+          {
+            "name": "Mission_group",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "GOES"
+              }
+            ]
+          },
+          {
+            "name": "Instrument_type",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Ephemeris/Attitude/Ancillary"
+              }
+            ]
+          },
+          {
+            "name": "LINK_TITLE",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "SSCWeb"
+              }
+            ]
+          },
+          {
+            "name": "HTTP_LINK",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "https://sscweb.gsfc.nasa.gov"
+              }
+            ]
+          },
+          {
+            "name": "LINK_TEXT",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "Other missions and capabilities of SPDF's"
+              }
+            ]
+          },
+          {
+            "name": "spase_DatasetResourceID",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "spase://NOAA/NumericalData/GOES/11/Ephemeris/PT3M"
+              }
+            ]
+          },
+          {
+            "name": "CDAWEB_PARENTS",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "goes11_ephemeris_ssc_00000000_v01"
+              },
+              {
+                "entryNum": 1,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "goes11_ephemeris_ssc_20000101_v01"
+              }
+            ]
+          },
+          {
+            "name": "PARENTS",
+            "entry": [
+              {
+                "entryNum": 0,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "goes11_ephemeris_ssc_00000000_v01"
+              },
+              {
+                "entryNum": 1,
+                "cdfDatatype": "CDF_CHAR",
+                "value": "goes11_ephemeris_ssc_20000101_v01"
+              }
+            ]
+          }
+        ]
+      },
+      "cdfVariables": {
+        "variable": [
+          {
+            "name": "Epoch",
+            "cdfVarInfo": {
+              "cdfDatatype": "CDF_EPOCH",
+              "dim": 0,
+              "numElements": 1,
+              "recVariance": "VARY",
+              "numRecordsAllocate": 61,
+              "padValue": "0000-01-01T00:00:00.000Z"
+            },
+            "cdfVAttributes": {
+              "attribute": [
+                {
+                  "name": "FIELDNAM",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_CHAR",
+                      "value": "Orbit Epoch Time"
+                    }
+                  ]
+                },
+                {
+                  "name": "VALIDMIN",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_DOUBLE",
+                      "value": "6.17253696E13"
+                    }
+                  ]
+                },
+                {
+                  "name": "VALIDMAX",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_DOUBLE",
+                      "value": "6.57332064E13"
+                    }
+                  ]
+                },
+                {
+                  "name": "SCALEMIN",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_DOUBLE",
+                      "value": "6.17253696E13"
+                    }
+                  ]
+                },
+                {
+                  "name": "SCALEMAX",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_DOUBLE",
+                      "value": "6.57332064E13"
+                    }
+                  ]
+                },
+                {
+                  "name": "LABLAXIS",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_CHAR",
+                      "value": "Epoch"
+                    }
+                  ]
+                },
+                {
+                  "name": "UNITS",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_CHAR",
+                      "value": "ms"
+                    }
+                  ]
+                },
+                {
+                  "name": "MONOTON",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_CHAR",
+                      "value": "INCREASE"
+                    }
+                  ]
+                },
+                {
+                  "name": "FILLVAL",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_DOUBLE",
+                      "value": "-1.0E31"
+                    }
+                  ]
+                },
+                {
+                  "name": "VAR_TYPE",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_CHAR",
+                      "value": "support_data"
+                    }
+                  ]
+                },
+                {
+                  "name": "CATDESC",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_CHAR",
+                      "value": "Time, beginning of interval"
+                    }
+                  ]
+                },
+                {
+                  "name": "DIM_SIZES",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_INT4",
+                      "value": "0"
+                    }
+                  ]
+                }
+              ]
+            },
+            "cdfVarData": {
+              "record": [
+                {
+                  "recNum": 0,
+                  "value": [
+                    "2010-04-05T08:00:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 1,
+                  "value": [
+                    "2010-04-05T08:03:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 2,
+                  "value": [
+                    "2010-04-05T08:06:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 3,
+                  "value": [
+                    "2010-04-05T08:09:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 4,
+                  "value": [
+                    "2010-04-05T08:12:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 5,
+                  "value": [
+                    "2010-04-05T08:15:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 6,
+                  "value": [
+                    "2010-04-05T08:18:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 7,
+                  "value": [
+                    "2010-04-05T08:21:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 8,
+                  "value": [
+                    "2010-04-05T08:24:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 9,
+                  "value": [
+                    "2010-04-05T08:27:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 10,
+                  "value": [
+                    "2010-04-05T08:30:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 11,
+                  "value": [
+                    "2010-04-05T08:33:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 12,
+                  "value": [
+                    "2010-04-05T08:36:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 13,
+                  "value": [
+                    "2010-04-05T08:39:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 14,
+                  "value": [
+                    "2010-04-05T08:42:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 15,
+                  "value": [
+                    "2010-04-05T08:45:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 16,
+                  "value": [
+                    "2010-04-05T08:48:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 17,
+                  "value": [
+                    "2010-04-05T08:51:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 18,
+                  "value": [
+                    "2010-04-05T08:54:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 19,
+                  "value": [
+                    "2010-04-05T08:57:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 20,
+                  "value": [
+                    "2010-04-05T09:00:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 21,
+                  "value": [
+                    "2010-04-05T09:03:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 22,
+                  "value": [
+                    "2010-04-05T09:06:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 23,
+                  "value": [
+                    "2010-04-05T09:09:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 24,
+                  "value": [
+                    "2010-04-05T09:12:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 25,
+                  "value": [
+                    "2010-04-05T09:15:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 26,
+                  "value": [
+                    "2010-04-05T09:18:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 27,
+                  "value": [
+                    "2010-04-05T09:21:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 28,
+                  "value": [
+                    "2010-04-05T09:24:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 29,
+                  "value": [
+                    "2010-04-05T09:27:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 30,
+                  "value": [
+                    "2010-04-05T09:30:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 31,
+                  "value": [
+                    "2010-04-05T09:33:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 32,
+                  "value": [
+                    "2010-04-05T09:36:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 33,
+                  "value": [
+                    "2010-04-05T09:39:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 34,
+                  "value": [
+                    "2010-04-05T09:42:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 35,
+                  "value": [
+                    "2010-04-05T09:45:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 36,
+                  "value": [
+                    "2010-04-05T09:48:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 37,
+                  "value": [
+                    "2010-04-05T09:51:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 38,
+                  "value": [
+                    "2010-04-05T09:54:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 39,
+                  "value": [
+                    "2010-04-05T09:57:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 40,
+                  "value": [
+                    "2010-04-05T10:00:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 41,
+                  "value": [
+                    "2010-04-05T10:03:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 42,
+                  "value": [
+                    "2010-04-05T10:06:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 43,
+                  "value": [
+                    "2010-04-05T10:09:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 44,
+                  "value": [
+                    "2010-04-05T10:12:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 45,
+                  "value": [
+                    "2010-04-05T10:15:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 46,
+                  "value": [
+                    "2010-04-05T10:18:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 47,
+                  "value": [
+                    "2010-04-05T10:21:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 48,
+                  "value": [
+                    "2010-04-05T10:24:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 49,
+                  "value": [
+                    "2010-04-05T10:27:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 50,
+                  "value": [
+                    "2010-04-05T10:30:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 51,
+                  "value": [
+                    "2010-04-05T10:33:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 52,
+                  "value": [
+                    "2010-04-05T10:36:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 53,
+                  "value": [
+                    "2010-04-05T10:39:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 54,
+                  "value": [
+                    "2010-04-05T10:42:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 55,
+                  "value": [
+                    "2010-04-05T10:45:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 56,
+                  "value": [
+                    "2010-04-05T10:48:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 57,
+                  "value": [
+                    "2010-04-05T10:51:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 58,
+                  "value": [
+                    "2010-04-05T10:54:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 59,
+                  "value": [
+                    "2010-04-05T10:57:00.000Z"
+                  ]
+                },
+                {
+                  "recNum": 60,
+                  "value": [
+                    "2010-04-05T11:00:00.000Z"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "RADIUS",
+            "cdfVarInfo": {
+              "cdfDatatype": "CDF_DOUBLE",
+              "dim": 0,
+              "numElements": 1,
+              "recVariance": "VARY",
+              "compression": "GZIP.6",
+              "numRecordsAllocate": 61,
+              "padValue": "-1.0E30",
+              "blockingFactor": 8192
+            },
+            "cdfVAttributes": {
+              "attribute": [
+                {
+                  "name": "FIELDNAM",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_CHAR",
+                      "value": "Radius"
+                    }
+                  ]
+                },
+                {
+                  "name": "VALIDMIN",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_DOUBLE",
+                      "value": "0.0"
+                    }
+                  ]
+                },
+                {
+                  "name": "VALIDMAX",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_DOUBLE",
+                      "value": "50000.0"
+                    }
+                  ]
+                },
+                {
+                  "name": "SCALEMIN",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_DOUBLE",
+                      "value": "0.0"
+                    }
+                  ]
+                },
+                {
+                  "name": "SCALEMAX",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_DOUBLE",
+                      "value": "50000.0"
+                    }
+                  ]
+                },
+                {
+                  "name": "LABLAXIS",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_CHAR",
+                      "value": "Orbit_Radius"
+                    }
+                  ]
+                },
+                {
+                  "name": "UNITS",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_CHAR",
+                      "value": "Re"
+                    }
+                  ]
+                },
+                {
+                  "name": "FORMAT",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_CHAR",
+                      "value": "F8.2"
+                    }
+                  ]
+                },
+                {
+                  "name": "DEPEND_0",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_CHAR",
+                      "value": "Epoch"
+                    }
+                  ]
+                },
+                {
+                  "name": "MONOTON",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_CHAR",
+                      "value": "FALSE"
+                    }
+                  ]
+                },
+                {
+                  "name": "FILLVAL",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_DOUBLE",
+                      "value": "-1.0E31"
+                    }
+                  ]
+                },
+                {
+                  "name": "VAR_TYPE",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_CHAR",
+                      "value": "data"
+                    }
+                  ]
+                },
+                {
+                  "name": "CATDESC",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_CHAR",
+                      "value": "Radial distance from the spacecraft to Earth."
+                    }
+                  ]
+                },
+                {
+                  "name": "DISPLAY_TYPE",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_CHAR",
+                      "value": "TIME_SERIES"
+                    }
+                  ]
+                },
+                {
+                  "name": "DIM_SIZES",
+                  "entry": [
+                    {
+                      "cdfDatatype": "CDF_INT4",
+                      "value": "0"
+                    }
+                  ]
+                }
+              ]
+            },
+            "cdfVarData": {
+              "record": [
+                {
+                  "recNum": 0,
+                  "value": [
+                    "6.611113186273751"
+                  ]
+                },
+                {
+                  "recNum": 1,
+                  "value": [
+                    "6.611114597535441"
+                  ]
+                },
+                {
+                  "recNum": 2,
+                  "value": [
+                    "6.611116613376024"
+                  ]
+                },
+                {
+                  "recNum": 3,
+                  "value": [
+                    "6.611118649606109"
+                  ]
+                },
+                {
+                  "recNum": 4,
+                  "value": [
+                    "6.611120673059344"
+                  ]
+                },
+                {
+                  "recNum": 5,
+                  "value": [
+                    "6.611121707814189"
+                  ]
+                },
+                {
+                  "recNum": 6,
+                  "value": [
+                    "6.611122824065671"
+                  ]
+                },
+                {
+                  "recNum": 7,
+                  "value": [
+                    "6.611124146879444"
+                  ]
+                },
+                {
+                  "recNum": 8,
+                  "value": [
+                    "6.611124863288029"
+                  ]
+                },
+                {
+                  "recNum": 9,
+                  "value": [
+                    "6.6111261976710045"
+                  ]
+                },
+                {
+                  "recNum": 10,
+                  "value": [
+                    "6.611126953248448"
+                  ]
+                },
+                {
+                  "recNum": 11,
+                  "value": [
+                    "6.61112795481211"
+                  ]
+                },
+                {
+                  "recNum": 12,
+                  "value": [
+                    "6.611128354556965"
+                  ]
+                },
+                {
+                  "recNum": 13,
+                  "value": [
+                    "6.611128633986168"
+                  ]
+                },
+                {
+                  "recNum": 14,
+                  "value": [
+                    "6.611128989339478"
+                  ]
+                },
+                {
+                  "recNum": 15,
+                  "value": [
+                    "6.61112873221011"
+                  ]
+                },
+                {
+                  "recNum": 16,
+                  "value": [
+                    "6.611128103968975"
+                  ]
+                },
+                {
+                  "recNum": 17,
+                  "value": [
+                    "6.611128152966866"
+                  ]
+                },
+                {
+                  "recNum": 18,
+                  "value": [
+                    "6.611128377895289"
+                  ]
+                },
+                {
+                  "recNum": 19,
+                  "value": [
+                    "6.611127829197779"
+                  ]
+                },
+                {
+                  "recNum": 20,
+                  "value": [
+                    "6.61112709288207"
+                  ]
+                },
+                {
+                  "recNum": 21,
+                  "value": [
+                    "6.611126599230225"
+                  ]
+                },
+                {
+                  "recNum": 22,
+                  "value": [
+                    "6.6111257680487565"
+                  ]
+                },
+                {
+                  "recNum": 23,
+                  "value": [
+                    "6.611124638264592"
+                  ]
+                },
+                {
+                  "recNum": 24,
+                  "value": [
+                    "6.611123056965524"
+                  ]
+                },
+                {
+                  "recNum": 25,
+                  "value": [
+                    "6.611122109204843"
+                  ]
+                },
+                {
+                  "recNum": 26,
+                  "value": [
+                    "6.6111212989968235"
+                  ]
+                },
+                {
+                  "recNum": 27,
+                  "value": [
+                    "6.611119179908935"
+                  ]
+                },
+                {
+                  "recNum": 28,
+                  "value": [
+                    "6.61111736496349"
+                  ]
+                },
+                {
+                  "recNum": 29,
+                  "value": [
+                    "6.611115486420766"
+                  ]
+                },
+                {
+                  "recNum": 30,
+                  "value": [
+                    "6.6111141644819735"
+                  ]
+                },
+                {
+                  "recNum": 31,
+                  "value": [
+                    "6.611111948556064"
+                  ]
+                },
+                {
+                  "recNum": 32,
+                  "value": [
+                    "6.611109356546691"
+                  ]
+                },
+                {
+                  "recNum": 33,
+                  "value": [
+                    "6.611107676070717"
+                  ]
+                },
+                {
+                  "recNum": 34,
+                  "value": [
+                    "6.611104739598797"
+                  ]
+                },
+                {
+                  "recNum": 35,
+                  "value": [
+                    "6.6111026564754924"
+                  ]
+                },
+                {
+                  "recNum": 36,
+                  "value": [
+                    "6.611099816695505"
+                  ]
+                },
+                {
+                  "recNum": 37,
+                  "value": [
+                    "6.611096760720497"
+                  ]
+                },
+                {
+                  "recNum": 38,
+                  "value": [
+                    "6.611093547436753"
+                  ]
+                },
+                {
+                  "recNum": 39,
+                  "value": [
+                    "6.611090881797838"
+                  ]
+                },
+                {
+                  "recNum": 40,
+                  "value": [
+                    "6.611087426499792"
+                  ]
+                },
+                {
+                  "recNum": 41,
+                  "value": [
+                    "6.611083922832633"
+                  ]
+                },
+                {
+                  "recNum": 42,
+                  "value": [
+                    "6.611080239572975"
+                  ]
+                },
+                {
+                  "recNum": 43,
+                  "value": [
+                    "6.611076592668349"
+                  ]
+                },
+                {
+                  "recNum": 44,
+                  "value": [
+                    "6.611073357327026"
+                  ]
+                },
+                {
+                  "recNum": 45,
+                  "value": [
+                    "6.611069010884645"
+                  ]
+                },
+                {
+                  "recNum": 46,
+                  "value": [
+                    "6.611065075156876"
+                  ]
+                },
+                {
+                  "recNum": 47,
+                  "value": [
+                    "6.6110613226012"
+                  ]
+                },
+                {
+                  "recNum": 48,
+                  "value": [
+                    "6.611057272403738"
+                  ]
+                },
+                {
+                  "recNum": 49,
+                  "value": [
+                    "6.611052543925377"
+                  ]
+                },
+                {
+                  "recNum": 50,
+                  "value": [
+                    "6.61104800945295"
+                  ]
+                },
+                {
+                  "recNum": 51,
+                  "value": [
+                    "6.611043210456335"
+                  ]
+                },
+                {
+                  "recNum": 52,
+                  "value": [
+                    "6.611038547254754"
+                  ]
+                },
+                {
+                  "recNum": 53,
+                  "value": [
+                    "6.6110335473814175"
+                  ]
+                },
+                {
+                  "recNum": 54,
+                  "value": [
+                    "6.6110287400568835"
+                  ]
+                },
+                {
+                  "recNum": 55,
+                  "value": [
+                    "6.611023473947588"
+                  ]
+                },
+                {
+                  "recNum": 56,
+                  "value": [
+                    "6.611018424719349"
+                  ]
+                },
+                {
+                  "recNum": 57,
+                  "value": [
+                    "6.61101307366957"
+                  ]
+                },
+                {
+                  "recNum": 58,
+                  "value": [
+                    "6.6110074718962215"
+                  ]
+                },
+                {
+                  "recNum": 59,
+                  "value": [
+                    "6.611002008385402"
+                  ]
+                },
+                {
+                  "recNum": 60,
+                  "value": [
+                    "6.610996369722466"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "orphanAttributes": {
+        "attribute": [
+          {
+            "name": "LABL_PTR_1"
+          },
+          {
+            "name": "DEPEND_1"
+          },
+          {
+            "name": "DICT_KEY"
+          },
+          {
+            "name": "VAR_NOTES"
+          },
+          {
+            "name": "AVG_TYPE"
+          },
+          {
+            "name": "VIRTUAL"
+          },
+          {
+            "name": "COMPONENT_0"
+          },
+          {
+            "name": "FUNCT"
+          }
+        ]
+      }
+    }
+  ],
+  "Message": [],
+  "Warning": [],
+  "Status": [],
+  "Error": []
+}
