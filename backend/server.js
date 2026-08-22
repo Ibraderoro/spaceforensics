@@ -33,11 +33,11 @@ function buildProvenanceMap(caseId) {
   try {
     const meta = JSON.parse(fs.readFileSync(caseJsonPath, 'utf8'));
     const map = new Map();
-    for (const ds of (meta.data_sources || [])) {
+    for (const ds of meta.data_sources || []) {
       map.set(ds.measurement, {
         dataset_id: ds.dataset_id,
-        provider:   ds.provider,
-        variable:   ds.variable,
+        provider: ds.provider,
+        variable: ds.variable,
       });
     }
     return map;
@@ -66,7 +66,12 @@ function parseEvidenceCSV(caseId) {
   return new Promise((resolve, reject) => {
     // NOTE: filename is currently case-specific. When new cases are added,
     // this should be generalised to glob for *_evidence.csv inside normalized/.
-    const csvPath = path.join(CASES_DIR, caseId, 'normalized', 'galaxy15_evidence.csv');
+    const csvPath = path.join(
+      CASES_DIR,
+      caseId,
+      'normalized',
+      'galaxy15_evidence.csv',
+    );
 
     if (!fs.existsSync(csvPath)) {
       return reject({ status: 404, message: 'Timeline data not found' });
@@ -81,24 +86,24 @@ function parseEvidenceCSV(caseId) {
       .on('data', (row) => {
         const prov = provenance.get(row.measurement) || {
           dataset_id: null,
-          provider:   null,
-          variable:   null,
+          provider: null,
+          variable: null,
         };
         rows.push({
           // --- original fields (unchanged) ---
-          timestamp:   row.timestamp,
-          source:      row.source,
+          timestamp: row.timestamp,
+          source: row.source,
           measurement: row.measurement,
-          value:       parseFloat(row.value),
-          unit:        row.unit,
-          resolution:  row.resolution,
+          value: parseFloat(row.value),
+          unit: row.unit,
+          resolution: row.resolution,
           // --- provenance fields ---
-          evidence_id:  null,          // assigned after sort
-          dataset_id:   prov.dataset_id,
-          provider:     prov.provider,
-          variable:     prov.variable,
+          evidence_id: null, // assigned after sort
+          dataset_id: prov.dataset_id,
+          provider: prov.provider,
+          variable: prov.variable,
           evidence_type: evidenceType(row.source),
-          quality:      null,          // no quality flag in this dataset
+          quality: null, // no quality flag in this dataset
         });
       })
       .on('end', () => {
@@ -107,9 +112,9 @@ function parseEvidenceCSV(caseId) {
         // evidence_id assignment is stable across repeated calls with identical input.
         rows.sort((a, b) => {
           if (a.timestamp < b.timestamp) return -1;
-          if (a.timestamp > b.timestamp) return  1;
-          if (a.source    < b.source)    return -1;
-          if (a.source    > b.source)    return  1;
+          if (a.timestamp > b.timestamp) return 1;
+          if (a.source < b.source) return -1;
+          if (a.source > b.source) return 1;
           return 0;
         });
 
@@ -198,8 +203,8 @@ app.get('/api/cases/:id/timeline', async (req, res) => {
 // ---------------------------------------------------------------------------
 function buildEvidenceGraph(caseId, rows) {
   // ── Partition rows by source ─────────────────────────────────────────────
-  const ep8Rows    = rows.filter((r) => r.source === 'GOES11_EP8');
-  const magRows    = rows.filter((r) => r.source === 'GOES11_MAG');
+  const ep8Rows = rows.filter((r) => r.source === 'GOES11_EP8');
+  const magRows = rows.filter((r) => r.source === 'GOES11_MAG');
   const anchorRows = rows.filter((r) => r.source === 'CASE');
 
   // ── Temporal investigation window around the anomaly ────────────────────
@@ -209,13 +214,13 @@ function buildEvidenceGraph(caseId, rows) {
     'MVP temporal selection window of ±10 minutes around the anomaly timestamp; ' +
     'this is an evidence-selection heuristic, not a scientifically calibrated causal threshold.';
   const anomalyTime = new Date('2010-04-05T09:48:00Z').getTime();
-  const WINDOW_MS   = 10 * 60 * 1000;
+  const WINDOW_MS = 10 * 60 * 1000;
 
   const ep8Window = ep8Rows.filter(
-    (r) => Math.abs(new Date(r.timestamp).getTime() - anomalyTime) <= WINDOW_MS
+    (r) => Math.abs(new Date(r.timestamp).getTime() - anomalyTime) <= WINDOW_MS,
   );
   const magWindow = magRows.filter(
-    (r) => Math.abs(new Date(r.timestamp).getTime() - anomalyTime) <= WINDOW_MS
+    (r) => Math.abs(new Date(r.timestamp).getTime() - anomalyTime) <= WINDOW_MS,
   );
 
   // ── Helpers ──────────────────────────────────────────────────────────────
@@ -235,49 +240,46 @@ function buildEvidenceGraph(caseId, rows) {
       id,
       'command_loss_consistent_with_multiple_mechanisms',
       'The anchor event (loss of ground command contact) is consistent with multiple ' +
-      'failure mechanisms and does not by itself discriminate among them.'
-    )
+        'failure mechanisms and does not by itself discriminate among them.',
+    ),
   );
 
   // ── EP8 environmental-context references (within heuristic window) ───────
+  // These establish preconditions contemporaneous with the anomaly.
+  // They do NOT confirm that charging occurred, that an ESD occurred, or that a
+  // particle caused an SEU.  Classification: environmental_context, not supporting_evidence.
   const ep8EnvRefs = dedup(ep8Window.map((r) => r.evidence_id)).map((id) =>
     ref(
       id,
-      'elevated_electron_flux_environment',
-      'Elevated 1 MeV electron flux measured by GOES-11 EP8 within the ±10-minute ' +
-      'heuristic investigation window establishes an energetic-particle environment ' +
-      'contemporaneous with the anomaly. This is environmental context; it does not ' +
-      'independently confirm a causal mechanism.'
-    )
+      'energetic_particle_environment_at_anomaly_time',
+      'GOES-11 EP8 1 MeV electron flux measured within the ±10-minute heuristic ' +
+        'investigation window establishes that an energetic-particle environment existed ' +
+        'contemporaneous with the anomaly. This is a precondition observation — it documents ' +
+        'what the environment was, not that a specific mechanism occurred. GOES-11 is a proxy ' +
+        'measurement ~2° of longitude from Galaxy 15; direct in-situ flux at the spacecraft ' +
+        'bus is unavailable.',
+    ),
   );
 
   // ── MAG environmental-context references (within heuristic window) ───────
+  // B_GSM documents geomagnetic conditions at GOES-11 orbit, not at the Galaxy 15 bus.
+  // Geomagnetic field magnitude is NOT a mechanism for SEU/latchup — SEUs are caused
+  // by high-energy particle flux.  Classification: environmental_context only.
   const magEnvRefs = dedup(magWindow.map((r) => r.evidence_id)).map((id) =>
     ref(
       id,
-      'magnetic_field_disturbance_near_anomaly',
-      'Magnetic field measurements from GOES-11 MAG within the ±10-minute heuristic ' +
-      'investigation window document geomagnetic conditions contemporaneous with the ' +
-      'anomaly. The field values are a proxy measurement at GOES-11 longitude, not ' +
-      'direct in-situ data at the Galaxy 15 spacecraft bus.'
-    )
+      'geomagnetic_conditions_at_anomaly_time',
+      'GOES-11 MAG B_GSM measurements within the ±10-minute heuristic investigation ' +
+        'window document geomagnetic field conditions contemporaneous with the anomaly. ' +
+        'These observations contextualise the space weather environment. B_GSM is the local ' +
+        'field at GOES-11 orbit, not at the Galaxy 15 spacecraft body; no magnetometer was ' +
+        'onboard Galaxy 15. Geomagnetic field magnitude does not directly support or exclude ' +
+        'an SEU or latchup mechanism — that determination requires particle flux data.',
+    ),
   );
-
-  // ── Non-discriminating EP8 + MAG references (all records, not windowed) ──
-  // Used for hypotheses where the environment is neither supporting nor contradicting.
-  const allEnvNonDiscrimRefs = dedup([
-    ...ep8Rows.map((r) => r.evidence_id),
-    ...magRows.map((r) => r.evidence_id),
-  ]).map((id) =>
-    ref(
-      id,
-      'environmental_conditions_neither_confirm_nor_exclude',
-      'Available environmental measurements neither confirm nor exclude this hypothesis. ' +
-      'The presence of an energetic-particle environment is not sufficient to attribute ' +
-      'or rule out any specific failure mechanism without additional telemetry.'
-    )
-  );
-
+  // Environmental observations are intentionally scoped to hypotheses where
+  // they provide temporal or physical context. Routine environmental records
+  // are not duplicated across unrelated hypotheses.
   // ────────────────────────────────────────────────────────────────────────
   // H1 — Spacecraft charging / electrostatic discharge
   // ────────────────────────────────────────────────────────────────────────
@@ -288,7 +290,11 @@ function buildEvidenceGraph(caseId, rows) {
       'Differential charging of spacecraft surfaces by sustained high-energy electron flux ' +
       'leading to an electrostatic discharge event that affected the command receiver or ' +
       'command-processing subsystem.',
-    supporting_evidence: ep8EnvRefs,
+    // EP8 windowed records establish the energetic-particle precondition for differential
+    // charging.  They do not confirm that surface charging reached a discharge threshold
+    // or that an ESD event occurred.  Classified as environmental_context.
+    environmental_context: ep8EnvRefs,
+    supporting_evidence: [],
     heuristic_note: HEURISTIC_WINDOW_NOTE,
     contradicting_evidence: [],
     non_discriminating_evidence: anchorRefs,
@@ -325,7 +331,12 @@ function buildEvidenceGraph(caseId, rows) {
       'A high-energy particle traversed the command-receiver or command-processor integrated ' +
       'circuit, causing a single-event upset (SEU) that flipped a critical configuration bit, ' +
       'or inducing a latchup that rendered the uplink receiver unresponsive.',
-    supporting_evidence: [...ep8EnvRefs, ...magEnvRefs],
+    // EP8 windowed records: energetic-particle environment is the relevant precondition for
+    // an SEU.  MAG windowed records: geomagnetic conditions provide environmental context
+    // only — B_GSM does not mechanistically support an SEU/latchup.  Neither dataset confirms
+    // that a particle traversed the command-receiver IC.  Classified as environmental_context.
+    environmental_context: [...ep8EnvRefs, ...magEnvRefs],
+    supporting_evidence: [],
     heuristic_note: HEURISTIC_WINDOW_NOTE,
     contradicting_evidence: [],
     non_discriminating_evidence: anchorRefs,
@@ -363,17 +374,22 @@ function buildEvidenceGraph(caseId, rows) {
       'A fault internal to the command receiver or command-processing chain — hardware, ' +
       'firmware, power-state, or software — produced a persistent loss of command uplink ' +
       'capability independent of the external environment.',
+    // H3 posits an internal fault independent of the external environment.  Particle flux
+    // and geomagnetic field data have no probative value here: the anomaly would present
+    // identically whether EP8 read 100 or 10,000 particles/cm²/s/sr.  Classified as empty.
+    environmental_context: [],
     supporting_evidence: anchorRows.map((r) =>
       ref(
         r.evidence_id,
         'persistent_command_unresponsiveness',
         'Extended command unresponsiveness is consistent with a persistent command-system fault, ' +
-        'but does not establish whether the underlying mechanism was hardware, software, latchup, ' +
-        'or another failure mode.'
-      )
+          'but does not establish whether the underlying mechanism was hardware, software, latchup, ' +
+          'or another failure mode.',
+      ),
     ),
     contradicting_evidence: [],
-    non_discriminating_evidence: allEnvNonDiscrimRefs,
+    non_discriminating_evidence: [],
+    heuristic_note: null,
     limitations: [
       {
         type: 'unresolved',
@@ -401,9 +417,14 @@ function buildEvidenceGraph(caseId, rows) {
     description:
       'A fault in the ground station, the RF uplink chain, or the command-routing infrastructure ' +
       'produced the apparent loss of command responsiveness without any fault on the spacecraft.',
+    // H4 concerns the ground segment and RF uplink.  Particle flux and geomagnetic field
+    // measurements at GEO are entirely orthogonal to a ground-station or RF-chain fault.
+    // No available evidence speaks to H4 at all; the hypothesis cannot be evaluated.
+    environmental_context: [],
     supporting_evidence: [],
     contradicting_evidence: [],
-    non_discriminating_evidence: allEnvNonDiscrimRefs,
+    non_discriminating_evidence: [],
+    heuristic_note: null,
     limitations: [
       {
         type: 'missing_data',
@@ -424,16 +445,21 @@ function buildEvidenceGraph(caseId, rows) {
     description:
       'The available evidence is insufficient to establish a causal mechanism for the Galaxy 15 ' +
       'command anomaly. This is a legitimate outcome of the investigation, not a failure to analyse.',
+    // H5 is supported by the anchor event and by the limitations enumerating missing
+    // discriminating data.  Flooding H5 with 200+ environmental records as "non-discriminating"
+    // adds no forensic value and obscures why attribution is unresolved.
+    environmental_context: [],
     supporting_evidence: anchorRows.map((r) =>
       ref(
         r.evidence_id,
         'anomaly_unresolved_after_investigation',
         'The anchor event documents a persistent anomaly whose causal mechanism is not established ' +
-        'by the available environmental or spacecraft data.'
-      )
+          'by the available environmental or spacecraft data.',
+      ),
     ),
     contradicting_evidence: [],
-    non_discriminating_evidence: allEnvNonDiscrimRefs,
+    non_discriminating_evidence: [],
+    heuristic_note: null,
     limitations: [
       {
         type: 'unresolved',
