@@ -1,0 +1,57 @@
+{
+  "case_id": "test-case-alpha",
+  "id_prefix": "TCA",
+  "title": "Test Case Alpha — GEO Satellite Command Loss (Synthetic)",
+  "description": "On 2009-08-12T14:30:00Z, a geostationary communications satellite became unresponsive to ground commands during a period of elevated solar energetic particle flux. This is a synthetic test case used to validate the multi-case pipeline architecture. All evidence values are representative of real GEO anomaly conditions but are not drawn from a specific historical event.",
+  "causal_attribution": "Causal attribution is not established by the available evidence.",
+  "anchor_event": {
+    "timestamp": "2009-08-12T14:30:00Z",
+    "label": "tca_command_loss",
+    "description": "Last successful ground command contact lost. Satellite continued telemetry transmission. Command uplink unresponsive."
+  },
+  "recovery_event": {
+    "timestamp": "2009-08-15T06:00:00Z",
+    "label": "tca_recovery",
+    "description": "Satellite autonomously resumed responding to ground commands after 3-day anomaly period."
+  },
+  "target_asset": {
+    "name": "Test Case Alpha Satellite",
+    "alias": "TCA-1",
+    "norad_id": 99001,
+    "orbit_type": "GEO",
+    "longitude_deg_west": -105.0,
+    "operator": "Test Operator",
+    "spacecraft_bus": "GeoStar-2 (Orbital Sciences)"
+  },
+  "data_window": {
+    "start": "2009-08-12T13:00:00Z",
+    "end": "2009-08-12T16:00:00Z",
+    "duration_minutes": 180
+  },
+  "data_sources": [
+    {
+      "dataset_id": "GOES13_K0_EP8",
+      "description": "GOES-13 Energetic Particle Sensor — 5-minute averaged electron and proton flux",
+      "variable": "E_1MEV_IC",
+      "measurement": "e_flux",
+      "unit": "particles/cm2/s/sr",
+      "resolution": "5min",
+      "provider": "NASA CDAWeb"
+    },
+    {
+      "dataset_id": "GOES13_K0_MAG",
+      "description": "GOES-13 Magnetometer — 1-minute averaged magnetic field in GSM coordinates",
+      "variable": "B_GSM",
+      "measurement": "b_gsm",
+      "unit": "nT",
+      "resolution": "1min",
+      "provider": "NASA CDAWeb"
+    }
+  ],
+  "scientific_limitations": [
+    "GOES-13 measurements are a proxy; direct in-situ measurements at the target spacecraft are unavailable.",
+    "The 5-minute averaging of EP8 particle flux data smooths sub-minute impulsive flux increases.",
+    "Causation between the space weather environment and the command anomaly is not established.",
+    "Ground software and RF link conditions are not captured in this dataset."
+  ]
+}

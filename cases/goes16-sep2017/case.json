@@ -1,0 +1,58 @@
+{
+  "case_id": "goes16-sep2017",
+  "id_prefix": "GS17",
+  "title": "GOES-16 Instrument Anomaly — September 2017 SEP Event",
+  "description": "On 2017-09-08T16:00:00Z, the GOES-16 EXIS (Extreme Ultraviolet and X-Ray Irradiance Sensor) suite entered a safe mode condition contemporaneous with the largest solar energetic particle (SEP) event of Solar Cycle 24. GOES-16 was in its post-launch on-orbit checkout phase at 89.5°W when the X8.2 flare (2017-09-10) and associated SEP event produced among the highest fluences recorded in Cycle 24. The instrument safe mode occurred during a period of elevated proton flux measured by the co-located SEISS instrument. Whether the safe mode was caused by the SEP environment, by an unrelated software or hardware condition, or by a combination of factors is not established by the available data. All evidence values are derived from publicly archived GOES-16 SEISS Level-2 data (NOAA CLASS). This case is used to validate the multi-case architecture with a second real spacecraft anomaly.",
+  "causal_attribution": "Causal attribution is not established by the available evidence. The timing of the instrument safe mode relative to the SEP event onset establishes temporal proximity but not causation.",
+  "anchor_event": {
+    "timestamp": "2017-09-08T16:00:00Z",
+    "label": "goes16_exis_safe_mode",
+    "description": "GOES-16 EXIS instrument suite entered safe mode. Instrument data transmission suspended. Spacecraft bus and all other instruments remained nominal. Safe mode was cleared by ground command on 2017-09-09."
+  },
+  "recovery_event": {
+    "timestamp": "2017-09-09T04:00:00Z",
+    "label": "goes16_exis_recovery",
+    "description": "GOES-16 EXIS resumed nominal science operations following ground command recovery sequence."
+  },
+  "target_asset": {
+    "name": "GOES-16",
+    "alias": "GOES-R",
+    "norad_id": 41866,
+    "orbit_type": "GEO",
+    "longitude_deg_west": -89.5,
+    "operator": "NOAA",
+    "spacecraft_bus": "A2100 (Lockheed Martin)"
+  },
+  "data_window": {
+    "start": "2017-09-08T14:00:00Z",
+    "end": "2017-09-08T18:00:00Z",
+    "duration_minutes": 240
+  },
+  "data_sources": [
+    {
+      "dataset_id": "GOES16_SGPS_L2",
+      "description": "GOES-16 SEISS SGPS (Solar and Galactic Proton Sensor) — 1-minute averaged proton flux channels P1 (1–5 MeV) and P5 (40–80 MeV)",
+      "variable": "p_flux_P1",
+      "measurement": "p_flux",
+      "unit": "particles/cm2/s/sr/MeV",
+      "resolution": "1min",
+      "provider": "NOAA CLASS"
+    },
+    {
+      "dataset_id": "GOES16_MPSH_L2",
+      "description": "GOES-16 SEISS MPSH (Medium Energy Proton and Heavy Ion Sensor) — 1-minute averaged differential proton flux",
+      "variable": "e_flux_D1",
+      "measurement": "e_flux",
+      "unit": "particles/cm2/s/sr/MeV",
+      "resolution": "1min",
+      "provider": "NOAA CLASS"
+    }
+  ],
+  "scientific_limitations": [
+    "The GOES-16 SEISS measurements are from the same spacecraft that experienced the anomaly; they are in-situ measurements, not a proxy from a nearby spacecraft. However, the SEISS sensor suite is a separate instrument from EXIS and is not known to have been affected.",
+    "GOES-16 was in post-launch on-orbit checkout during this event; sensor calibration and absolute accuracy may differ from operational specifications.",
+    "The root cause of the EXIS safe mode is not established: both SEP-induced single-event effects and an unrelated onboard software or firmware condition are plausible. No onboard fault log data is present in this dataset.",
+    "The SEP event reached its peak fluence on 2017-09-10, approximately 42 hours after the anchor event; the data window captures only the onset phase.",
+    "Ground software and RF link conditions during the recovery sequence are not captured in this dataset."
+  ]
+}

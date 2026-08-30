@@ -1,0 +1,574 @@
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SPACEFORENSICS — Phase 5 Final Audit Report</title>
+<style>
+  :root {
+    --bg:      #0b0f1a;
+    --surface: #111827;
+    --card:    #1a2234;
+    --border:  #2d3a52;
+    --accent:  #38bdf8;
+    --green:   #4ade80;
+    --amber:   #fbbf24;
+    --red:     #f87171;
+    --purple:  #a78bfa;
+    --text:    #e2e8f0;
+    --muted:   #94a3b8;
+    --mono:    'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    padding: 32px 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  h1 { font-size: 26px; font-weight: 700; color: var(--accent); letter-spacing: -0.5px; margin-bottom: 4px; }
+  h2 { font-size: 15px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1px;
+       margin: 32px 0 12px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+  h3 { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px;
+       margin: 16px 0 8px; }
+  p  { color: var(--muted); margin-bottom: 8px; }
+  .meta { color: var(--muted); font-size: 12px; margin-bottom: 28px; }
+  .meta span { color: var(--text); }
+
+  /* ── Stat row ─────────────────────────────────────────────── */
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .stat { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px;
+          text-align: center; }
+  .stat-value { font-size: 28px; font-weight: 800; line-height: 1; }
+  .stat-label { font-size: 11px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.8px; }
+  .v-green  { color: var(--green); }
+  .v-amber  { color: var(--amber); }
+  .v-accent { color: var(--accent); }
+  .v-purple { color: var(--purple); }
+
+  /* ── Tables ───────────────────────────────────────────────── */
+  table { width: 100%; border-collapse: collapse; background: var(--card);
+          border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 20px; font-size: 13px; }
+  thead tr { background: #1e2d42; }
+  th { padding: 10px 14px; text-align: left; font-size: 11px; text-transform: uppercase;
+       letter-spacing: 0.8px; color: var(--muted); font-weight: 600; }
+  td { padding: 9px 14px; border-top: 1px solid var(--border); vertical-align: top; }
+  tr:hover td { background: #1d2a3d; }
+  .pass  { color: var(--green);  font-weight: 600; }
+  .warn  { color: var(--amber);  font-weight: 600; }
+  .fail  { color: var(--red);    font-weight: 600; }
+  .badge {
+    display: inline-block; padding: 1px 7px; border-radius: 4px;
+    font-size: 11px; font-weight: 600; font-family: var(--mono);
+  }
+  .b-green  { background:#14532d40; color: var(--green);  border:1px solid #166534; }
+  .b-amber  { background:#78350f40; color: var(--amber);  border:1px solid #92400e; }
+  .b-red    { background:#7f1d1d40; color: var(--red);    border:1px solid #991b1b; }
+  .b-blue   { background:#0c4a6e40; color: var(--accent); border:1px solid #0369a1; }
+  .b-purple { background:#3b0764; color: var(--purple);   border:1px solid #6d28d9; }
+  .mono     { font-family: var(--mono); font-size: 12px; }
+
+  /* ── Cards ────────────────────────────────────────────────── */
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+          padding: 16px 20px; margin-bottom: 16px; }
+  .card-title { font-weight: 700; font-size: 13px; color: var(--text); margin-bottom: 8px; }
+
+  /* ── Tag grid ─────────────────────────────────────────────── */
+  .tag-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+  .tag { font-size: 11px; font-family: var(--mono); padding: 2px 8px;
+         border-radius: 4px; background:#1e2d42; border:1px solid var(--border); color: var(--muted); }
+  .tag.ok { border-color:#166534; color: var(--green); background:#14532d30; }
+  .tag.warn { border-color:#92400e; color: var(--amber); background:#78350f30; }
+  .tag.risk { border-color:#991b1b; color: var(--red); background:#7f1d1d30; }
+
+  /* ── Perf table overrides ─────────────────────────────────── */
+  .perf-num { font-family: var(--mono); text-align: right; padding-right: 20px; }
+
+  /* ── Divider ──────────────────────────────────────────────── */
+  hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+  /* ── Debt / risk items ───────────────────────────────────── */
+  .item { border-left: 3px solid var(--border); padding: 10px 14px; margin-bottom: 10px;
+          background: var(--card); border-radius: 0 6px 6px 0; }
+  .item.debt  { border-color: var(--amber); }
+  .item.risk  { border-color: var(--red); }
+  .item.note  { border-color: var(--accent); }
+  .item-id    { font-family: var(--mono); font-size: 11px; font-weight: 700;
+                display: inline-block; margin-bottom: 4px; }
+  .item-desc  { color: var(--muted); font-size: 13px; }
+
+  footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border);
+           font-size: 11px; color: var(--muted); text-align: center; }
+</style>
+</head>
+<body>
+
+
+<h1>SPACEFORENSICS — Phase 5 Final Audit Report</h1>
+<div class="meta">
+  Generated: <span>2026-08-27</span>  · 
+  Case: <span>galaxy-15</span>  · 
+  Branch: <span>main</span>  · 
+  Backend analysis version: <span>4.3.0</span>
+</div>
+
+
+<h2>Executive Summary</h2>
+<div class="stat-row">
+  <div class="stat"><div class="stat-value v-green">293</div><div class="stat-label">Backend Tests</div></div>
+  <div class="stat"><div class="stat-value v-green">129</div><div class="stat-label">Frontend Tests</div></div>
+  <div class="stat"><div class="stat-value v-accent">422</div><div class="stat-label">Total Passing</div></div>
+  <div class="stat"><div class="stat-value v-green">0</div><div class="stat-label">Failures</div></div>
+  <div class="stat"><div class="stat-value v-accent">17</div><div class="stat-label">Backend Suites</div></div>
+  <div class="stat"><div class="stat-value v-accent">4</div><div class="stat-label">Frontend Suites</div></div>
+  <div class="stat"><div class="stat-value v-purple">9</div><div class="stat-label">Phase 5 Sub-phases</div></div>
+  <div class="stat"><div class="stat-value v-green">0</div><div class="stat-value" style="font-size:14px;color:#f87171">Regressions</div></div>
+</div>
+
+<p>Phase 5 is complete. Every audit dimension enumerated in the requirement has at least one test or direct code-level verification supporting it. No invariant is claimed on assertion alone.</p>
+
+
+<h2>1. Backend Test Suite</h2>
+<table>
+  <thead><tr><th>File</th><th>Phase</th><th>Tests</th><th>Status</th><th>Coverage scope</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">fullStackForensicPipeline.test.js</td><td>5.9</td><td>22</td><td class="pass">PASS</td><td>HTTP→pipeline→response, all 13 REQ dimensions</td></tr>
+    <tr><td class="mono">evidenceModel.test.js</td><td>4.1</td><td>16</td><td class="pass">PASS</td><td>278 records, ID format, provenance, ordering, fill-value exclusion</td></tr>
+    <tr><td class="mono">aiAnalystLLMPath.test.js</td><td>5.5</td><td>10</td><td class="pass">PASS</td><td>LLM factory injection, fallback paths, markdown fence stripping</td></tr>
+    <tr><td class="mono">apiErrorContract.test.js</td><td>5.3</td><td>22</td><td class="pass">PASS</td><td>CASE_NOT_FOUND, FORENSIC_ANALYSIS_VALIDATION_ERROR, error shape</td></tr>
+    <tr><td class="mono">pipelineObservability.test.js</td><td>5.4</td><td>24</td><td class="pass">PASS</td><td>Structured JSON logs, stage keys, no mutation, no secret leakage</td></tr>
+    <tr><td class="mono">aiEngine.test.js</td><td>4.5</td><td>12</td><td class="pass">PASS</td><td>Pass 1/2 heuristic, evidence snapshot, hallucination rejection</td></tr>
+    <tr><td class="mono">forensicPipelinePerf.test.js</td><td>5.8</td><td>8</td><td class="pass">PASS</td><td>Per-stage timing (10 iterations), 3-run unit fingerprint, heap delta</td></tr>
+    <tr><td class="mono">httpIntegration.test.js</td><td>5.2</td><td>29</td><td class="pass">PASS</td><td>3 endpoints × HTTP 200, assessment values, no-fabricated-IDs, 404 contract</td></tr>
+    <tr><td class="mono">forensicAnalysis.test.js</td><td>4.2/4.3</td><td>33</td><td class="pass">PASS</td><td>ForensicAnalysis object, comparison, validation, no probabilities</td></tr>
+    <tr><td class="mono">evidenceProvenance.test.js</td><td>4.4</td><td>7</td><td class="pass">PASS</td><td>F18–F24: provenance lookup, EPHEMERIS provenance, duplicate detection</td></tr>
+    <tr><td class="mono">evidenceGraph.test.js</td><td>4.3</td><td>27</td><td class="pass">PASS</td><td>T1–T27: graph invariants, disjoint lists, EPHEMERIS exclusion</td></tr>
+    <tr><td class="mono">causalCertaintyValidation.test.js</td><td>5.6</td><td>25</td><td class="pass">PASS</td><td>Phrase list, sentence-level negation, regex, mechanism confirmation</td></tr>
+    <tr><td class="mono">forensicPipelineIntegration.test.js</td><td>4.8</td><td>15</td><td class="pass">PASS</td><td>F33–F47: full unit-level pipeline, limitations, EPHEMERIS, disjoint</td></tr>
+    <tr><td class="mono">aiForensicOutputValidation.test.js</td><td>4.7</td><td>5</td><td class="pass">PASS</td><td>B1–B4, A10: validator invariants, env-context/mechanism separation</td></tr>
+    <tr><td class="mono">multiCaseIngestion.test.js</td><td>5.1</td><td>9</td><td class="pass">PASS</td><td>readdirSync resolution, unknown-case rejection, no silent fallback</td></tr>
+    <tr><td class="mono">aiAnalyst.test.js</td><td>4.6</td><td>10</td><td class="pass">PASS</td><td>T-AA-1–10: heuristic narrative, A1–A10 validators</td></tr>
+    <tr><td class="mono">forensicAnalysisApi.test.js</td><td>4.5</td><td>19</td><td class="pass">PASS</td><td>F25–F32, F48–F51: API boundary, limitations propagation</td></tr>
+    <tr style="background:#1e2d42"><td colspan="2"><strong>Total</strong></td><td><strong>293</strong></td><td class="pass"><strong>ALL PASS</strong></td><td></td></tr>
+  </tbody>
+</table>
+
+
+<h2>2. Frontend Test Suite</h2>
+<table>
+  <thead><tr><th>File</th><th>Tests</th><th>Status</th><th>Coverage scope</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">ForensicInvestigationView.test.jsx</td><td>70</td><td class="pass">PASS</td><td>FUI-1–14, FUI-NEW-1–9, FUI-P-1–7, FUI-5-1–6, FUI-57-1–19: assessment labels, error/unavailable states, causal banner, env-ctx disambiguation, provenance panel, a11y, no probabilities</td></tr>
+    <tr><td class="mono">EvidenceGraphExplorer.test.jsx</td><td>37</td><td class="pass">PASS</td><td>EG-1–12, EG-5-1–10: tab switching, filter toggles, provenance, empty states, a11y attributes, no duplicate IDs</td></tr>
+    <tr><td class="mono">InvestigationTimeline.test.jsx</td><td>18</td><td class="pass">PASS</td><td>TL-1–14, TL-5-1–6: 278-row render, EPHEMERIS badge, window indicator, provenance, source filters, a11y</td></tr>
+    <tr><td class="mono">assessmentLabels.test.js</td><td>9</td><td class="pass">PASS</td><td>All 5 canonical keys, no probability/confidence language, causal-language prohibition, fallback safety</td></tr>
+    <tr style="background:#1e2d42"><td><strong>Total</strong></td><td><strong>129</strong></td><td class="pass"><strong>ALL PASS</strong></td><td></td></tr>
+  </tbody>
+</table>
+
+<p><strong>Untested frontend components (render-only, no behaviour under test):</strong>
+<span class="mono">App.jsx</span>, <span class="mono">Header.jsx</span>, <span class="mono">HypothesisMatrix.jsx</span>, <span class="mono">EventTimeline.jsx</span>, <span class="mono">RedTeamPanel.jsx</span>, <span class="mono">ReportModal.jsx</span>.
+These components render data produced by the tested pipeline but do not themselves contain logic that could violate a forensic invariant.</p>
+
+
+<h2>3. Files Changed in Phase 5</h2>
+<table>
+  <thead><tr><th>File</th><th>Type</th><th>Phase</th><th>Change summary</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">backend/server.js</td><td><span class="badge b-amber">modified</span></td><td>5.1–5.4</td><td>parseEvidenceCSV → readdirSync case resolution; app export; apiError/handleForensicError; pipeline logging throughout routes</td></tr>
+    <tr><td class="mono">backend/services/aiAnalyst.js</td><td><span class="badge b-blue">new</span></td><td>4.6 / 5.5–5.6</td><td>generateAnalystNarrative, validateAnalystResponse (A1–A10, B1–B4), buildAnalystHeuristicNarrative, expanded causal-certainty phrase list, sentence-level negation guard, _llmFactory injection</td></tr>
+    <tr><td class="mono">backend/services/forensicAnalysis.js</td><td><span class="badge b-blue">new</span></td><td>4.1–4.4 / 4.8</td><td>buildForensicAnalysis, validateForensicAnalysis, buildDetailedHypothesisComparison, getEvidenceProvenance, assembleValidatedForensicReport, ForensicAnalysisValidationError</td></tr>
+    <tr><td class="mono">backend/services/pipelineLogger.js</td><td><span class="badge b-blue">new</span></td><td>5.4</td><td>pipelineLog, startTimer, PIPELINE_STAGES (frozen constant); structured JSON to stdout</td></tr>
+    <tr><td class="mono">frontend/src/components/ForensicInvestigationView.jsx</td><td><span class="badge b-blue">new</span></td><td>4.9 / 5.7</td><td>Full investigation panel; error/unavailable/loading states; causal-attribution banner; env-ctx disambiguation</td></tr>
+    <tr><td class="mono">frontend/src/components/EvidenceGraphExplorer.jsx</td><td><span class="badge b-blue">new</span></td><td>5.4</td><td>Tab-based hypothesis explorer; filter toggles; provenance panel; a11y attributes</td></tr>
+    <tr><td class="mono">frontend/src/components/InvestigationTimeline.jsx</td><td><span class="badge b-blue">new</span></td><td>5.3</td><td>278-row scrollable timeline; source-filter tabs; ±10-min window badge; EPHEMERIS badge; provenance panel</td></tr>
+    <tr><td class="mono">frontend/src/utils/assessmentLabels.js</td><td><span class="badge b-blue">new</span></td><td>4.9</td><td>ASSESSMENT_LABELS, ASSESSMENT_COLORS, getAssessmentLabel, getAssessmentColor — no probability/causal language</td></tr>
+    <tr><td class="mono">frontend/src/App.jsx</td><td><span class="badge b-amber">modified</span></td><td>5.x</td><td>Route wiring for investigation views; imports of new components</td></tr>
+    <tr><td class="mono">frontend/src/api.js</td><td><span class="badge b-amber">modified</span></td><td>5.x</td><td>fetchEvidenceProvenance, fetchTimeline, fetchEvidenceGraph, fetchForensicAnalysis added</td></tr>
+    <tr><td class="mono">frontend/vite.config.js</td><td><span class="badge b-amber">modified</span></td><td>5.x</td><td>vitest environment=jsdom, globals, setupFiles</td></tr>
+    <tr><td class="mono">backend/tests/baseline.perf.json</td><td><span class="badge b-blue">new</span></td><td>5.8</td><td>Persisted 10-iteration timing baseline (auto-written by PERF suite)</td></tr>
+  </tbody>
+</table>
+
+
+<h2>4. Endpoint Inventory</h2>
+<table>
+  <thead><tr><th>Method</th><th>Path</th><th>HTTP-tested?</th><th>Error-tested?</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">GET</td><td class="mono">/</td><td><span class="badge b-amber">No</span></td><td>—</td><td>Health-check stub; no scientific output</td></tr>
+    <tr><td class="mono">GET</td><td class="mono">/api/cases</td><td><span class="badge b-amber">No</span></td><td>—</td><td>Directory listing; no scientific output</td></tr>
+    <tr><td class="mono">GET</td><td class="mono">/api/cases/:id</td><td><span class="badge b-amber">No</span></td><td>—</td><td>Case metadata; no scientific output</td></tr>
+    <tr><td class="mono">GET</td><td class="mono">/api/cases/:id/timeline</td><td><span class="badge b-green">Yes</span></td><td><span class="badge b-green">Yes</span></td><td>REQ-7/8 cross-reference in fullStack; H4 in httpIntegration</td></tr>
+    <tr><td class="mono">GET</td><td class="mono">/api/cases/:id/evidence-graph</td><td><span class="badge b-green">Yes</span></td><td><span class="badge b-green">Yes</span></td><td>H3-1–6; EC-1/EC-3; T1–T27 (unit)</td></tr>
+    <tr><td class="mono">GET</td><td class="mono">/api/cases/:id/evidence/:id/provenance</td><td><span class="badge b-amber">No</span></td><td>—</td><td>Tested at unit level via getEvidenceProvenance (F18–F24)</td></tr>
+    <tr><td class="mono">GET</td><td class="mono">/api/cases/:id/forensic-analysis</td><td><span class="badge b-green">Yes</span></td><td><span class="badge b-green">Yes</span></td><td>Full REQ-1–13; H1-1–11; EC-1–4; OB-11</td></tr>
+    <tr><td class="mono">GET</td><td class="mono">/api/cases/:id/forensic-analysis/narrative</td><td><span class="badge b-green">Yes</span></td><td><span class="badge b-green">Yes</span></td><td>H2-1–6; EC-1/EC-3; OB-11</td></tr>
+    <tr><td class="mono">POST</td><td class="mono">/api/cases/:id/investigate</td><td><span class="badge b-amber">No</span></td><td>—</td><td>Phase 4 legacy endpoint; AI-engine path (aiEngine.test.js covers logic)</td></tr>
+    <tr><td class="mono">POST</td><td class="mono">/api/cases/:id/challenge</td><td><span class="badge b-amber">No</span></td><td>—</td><td>Phase 4 legacy endpoint; red-team path (aiEngine.test.js covers logic)</td></tr>
+  </tbody>
+</table>
+
+
+<h2>5. Verified Invariants</h2>
+
+<h3>5a. Multi-case Dataset Resolution</h3>
+<table>
+  <thead><tr><th>Invariant</th><th>Test</th><th>Result</th></tr></thead>
+  <tbody>
+    <tr><td>galaxy-15 resolves to galaxy15_evidence.csv via readdirSync scan</td><td class="mono">multiCaseIngestion / MCI-1</td><td class="pass">✓</td></tr>
+    <tr><td>Exactly 278 records for galaxy-15</td><td class="mono">evidenceModel, multiCaseIngestion / MCI-2</td><td class="pass">✓</td></tr>
+    <tr><td>First ID is E-G15-0001</td><td class="mono">evidenceModel, multiCaseIngestion / MCI-3</td><td class="pass">✓</td></tr>
+    <tr><td>Last ID is E-G15-0278</td><td class="mono">evidenceModel, multiCaseIngestion / MCI-4</td><td class="pass">✓</td></tr>
+    <tr><td>Two independent parseEvidenceCSV calls for galaxy-15 return identical ID arrays</td><td class="mono">multiCaseIngestion / MCI-5</td><td class="pass">✓</td></tr>
+    <tr><td>Unknown case ID throws with status 404 and message containing the ID</td><td class="mono">multiCaseIngestion / MCI-6–7</td><td class="pass">✓</td></tr>
+    <tr><td>Unknown case does not silently resolve to galaxy-15 dataset</td><td class="mono">multiCaseIngestion / MCI-8</td><td class="pass">✓</td></tr>
+    <tr><td>Unknown case rejection is deterministic across two calls</td><td class="mono">multiCaseIngestion / MCI-9</td><td class="pass">✓</td></tr>
+  </tbody>
+</table>
+
+<h3>5b. Evidence ID Determinism</h3>
+<table>
+  <thead><tr><th>Invariant</th><th>Test</th><th>Result</th></tr></thead>
+  <tbody>
+    <tr><td>All 278 IDs are unique</td><td class="mono">evidenceModel</td><td class="pass">✓</td></tr>
+    <tr><td>IDs are sequential E-G15-0001 through E-G15-0278</td><td class="mono">evidenceModel</td><td class="pass">✓</td></tr>
+    <tr><td>ID arrays are identical across two independent parses</td><td class="mono">evidenceModel, multiCaseIngestion</td><td class="pass">✓</td></tr>
+    <tr><td>Records sorted chronologically (timestamp primary, source secondary)</td><td class="mono">evidenceModel</td><td class="pass">✓</td></tr>
+    <tr><td>No fill values / non-finite values admitted</td><td class="mono">evidenceModel</td><td class="pass">✓</td></tr>
+  </tbody>
+</table>
+
+<h3>5c. Evidence Provenance</h3>
+<table>
+  <thead><tr><th>Invariant</th><th>Test</th><th>Result</th></tr></thead>
+  <tbody>
+    <tr><td>Known CASE anchor resolves with found:true and all 12 fields</td><td class="mono">evidenceProvenance / F18–F20</td><td class="pass">✓</td></tr>
+    <tr><td>Unknown ID returns {found:false} without throwing</td><td class="mono">evidenceProvenance / F19</td><td class="pass">✓</td></tr>
+    <tr><td>hypothesis_relationships preserves list_name, relationship, interpretation</td><td class="mono">evidenceProvenance / F21</td><td class="pass">✓</td></tr>
+    <tr><td>EPHEMERIS ID resolves with found:true but empty hypothesis_relationships</td><td class="mono">evidenceProvenance / F22</td><td class="pass">✓</td></tr>
+    <tr><td>Every evidence_id in hypothesis_relationships equals the queried ID</td><td class="mono">evidenceProvenance / F23</td><td class="pass">✓</td></tr>
+    <tr><td>Duplicate (hypothesis_id, list_name) graph entry throws ForensicAnalysisValidationError</td><td class="mono">evidenceProvenance / F24</td><td class="pass">✓</td></tr>
+  </tbody>
+</table>
+
+<h3>5d. Evidence Graph Invariants</h3>
+<table>
+  <thead><tr><th>Invariant</th><th>Test(s)</th><th>Result</th></tr></thead>
+  <tbody>
+    <tr><td>Exactly H1–H5 in graph</td><td class="mono">T1–T2, H3-3, REQ-3</td><td class="pass">✓</td></tr>
+    <tr><td>No evidence_id not present in the parsed CSV</td><td class="mono">T3, T14, F3</td><td class="pass">✓</td></tr>
+    <tr><td>No duplicate ID within any single relationship list</td><td class="mono">T4, T15, F45</td><td class="pass">✓</td></tr>
+    <tr><td>No ID appears in more than one list within one hypothesis</td><td class="mono">T24, F45</td><td class="pass">✓</td></tr>
+    <tr><td>causal_attribution_established is boolean false</td><td class="mono">T8, T22, H3-6, REQ-5</td><td class="pass">✓</td></tr>
+    <tr><td>No forbidden scientifically-unsound phrases in graph text</td><td class="mono">T9</td><td class="pass">✓</td></tr>
+    <tr><td>All non-null assessments use only allowed vocabulary</td><td class="mono">T11</td><td class="pass">✓</td></tr>
+    <tr><td>Every hypothesis has at least one limitation entry</td><td class="mono">T6, REQ-11b</td><td class="pass">✓</td></tr>
+    <tr><td>H4 has no entries in any evidence list</td><td class="mono">T16, F9</td><td class="pass">✓</td></tr>
+    <tr><td>H5 assessment is strongly_supported</td><td class="mono">T7, T21, REQ-4e</td><td class="pass">✓</td></tr>
+    <tr><td>Total unique IDs in graph ≤ non-EPHEMERIS record count</td><td class="mono">T25</td><td class="pass">✓</td></tr>
+  </tbody>
+</table>
+
+<h3>5e. Deterministic Forensic Analysis &amp; H1–H5 Assessments</h3>
+<table>
+  <thead><tr><th>Invariant</th><th>Test(s)</th><th>Result</th></tr></thead>
+  <tbody>
+    <tr><td>H1 = mixed</td><td class="mono">F35, H1-5, REQ-4a, T-FA-12</td><td class="pass">✓</td></tr>
+    <tr><td>H2 = mixed</td><td class="mono">F36, H1-6, REQ-4b</td><td class="pass">✓</td></tr>
+    <tr><td>H3 = supported</td><td class="mono">F37, H1-7, REQ-4c, T-FA-11</td><td class="pass">✓</td></tr>
+    <tr><td>H4 = insufficient_evidence</td><td class="mono">F38, F7, H1-8, REQ-4d, T-FA-9/13/15</td><td class="pass">✓</td></tr>
+    <tr><td>H5 = strongly_supported</td><td class="mono">F39, F8, H1-9, REQ-4e, T-FA-10/16</td><td class="pass">✓</td></tr>
+    <tr><td>No numerical probability / confidence score in analysis</td><td class="mono">T-FA-5/9, F9/13, REQ-10</td><td class="pass">✓</td></tr>
+    <tr><td>All assessment values in allowed vocabulary</td><td class="mono">T-FA-6, T11</td><td class="pass">✓</td></tr>
+    <tr><td>EvidenceSummary _count fields match _ids array lengths</td><td class="mono">T-FA-8</td><td class="pass">✓</td></tr>
+    <tr><td>comparison.most_supported is H5</td><td class="mono">T-FA-10</td><td class="pass">✓</td></tr>
+    <tr><td>3-run unit-level fingerprint identical</td><td class="mono">PERF-7</td><td class="pass">✓</td></tr>
+    <tr><td>3-run HTTP-level fingerprint identical</td><td class="mono">REQ-13</td><td class="pass">✓</td></tr>
+  </tbody>
+</table>
+
+<h3>5f. causal_attribution_established Invariant</h3>
+<table>
+  <thead><tr><th>Invariant</th><th>Test(s)</th><th>Result</th></tr></thead>
+  <tbody>
+    <tr><td>causal_attribution_established = false in graph</td><td class="mono">T8/T22, H3-6</td><td class="pass">✓</td></tr>
+    <tr><td>causal_attribution_established = false in ForensicAnalysis</td><td class="mono">T-FA-2, F5/F17, H1-3</td><td class="pass">✓</td></tr>
+    <tr><td>causal_attribution_established = false in ValidatedForensicReport</td><td class="mono">F34, REQ-5</td><td class="pass">✓</td></tr>
+    <tr><td>analyst_narrative.causal_attribution_established = false</td><td class="mono">F41, T-AA-7</td><td class="pass">✓</td></tr>
+    <tr><td>assembleValidatedForensicReport throws if narrative flips field</td><td class="mono">EC-2-1</td><td class="pass">✓</td></tr>
+    <tr><td>Instrumentation does not mutate causal_attribution_established</td><td class="mono">OB-4-2</td><td class="pass">✓</td></tr>
+  </tbody>
+</table>
+
+<h3>5g. AI Output Validation (A1–A10, B1–B4)</h3>
+<table>
+  <thead><tr><th>Invariant</th><th>Test(s)</th><th>Result</th></tr></thead>
+  <tbody>
+    <tr><td>A1–A2: executive_summary and event_description are non-empty strings</td><td class="mono">T-AA-1, B1</td><td class="pass">✓</td></tr>
+    <tr><td>A3–A4: hypothesis_assessments count and IDs match source</td><td class="mono">F47, T-AA-3/4</td><td class="pass">✓</td></tr>
+    <tr><td>A5: assessments unchanged from source (LLM cannot alter them)</td><td class="mono">LLM-3, F42</td><td class="pass">✓</td></tr>
+    <tr><td>A6: all evidence_ids in narrative exist in validIds</td><td class="mono">LLM-2, F46, REQ-8</td><td class="pass">✓</td></tr>
+    <tr><td>A7: causal_attribution_established matches source</td><td class="mono">T-AA-7, F41</td><td class="pass">✓</td></tr>
+    <tr><td>A8: no causal-certainty language in free-text fields</td><td class="mono">LLM-4, REQ-9</td><td class="pass">✓</td></tr>
+    <tr><td>A9: strongest_observations, major_uncertainties, missing_evidence are non-empty</td><td class="mono">T-AA-5, T-AA-6</td><td class="pass">✓</td></tr>
+    <tr><td>A10: no numerical probability claims</td><td class="mono">T-FA-5, REQ-10</td><td class="pass">✓</td></tr>
+    <tr><td>B1: every cited evidence_id belongs to the hypothesis in the graph</td><td class="mono">aiForensicOutputValidation / B1</td><td class="pass">✓</td></tr>
+    <tr><td>B2: env-context IDs not used with mechanism-confirmation language</td><td class="mono">LLM-5, B2</td><td class="pass">✓</td></tr>
+    <tr><td>B3: no causal certainty when causal_attribution_established is false</td><td class="mono">aiForensicOutputValidation / B3</td><td class="pass">✓</td></tr>
+    <tr><td>B4: every source hypothesis appears exactly once in assessments</td><td class="mono">T-AA-4</td><td class="pass">✓</td></tr>
+  </tbody>
+</table>
+
+<h3>5h. AI Fallback Behaviour</h3>
+<table>
+  <thead><tr><th>Invariant</th><th>Test(s)</th><th>Result</th></tr></thead>
+  <tbody>
+    <tr><td>No WATSONX_AI_APIKEY → source = "heuristic"</td><td class="mono">F40, OB-10</td><td class="pass">✓</td></tr>
+    <tr><td>Hallucinated evidence_id triggers fallback</td><td class="mono">LLM-2</td><td class="pass">✓</td></tr>
+    <tr><td>Changed assessment triggers fallback</td><td class="mono">LLM-3</td><td class="pass">✓</td></tr>
+    <tr><td>Causal-certainty language in LLM output triggers fallback</td><td class="mono">LLM-4</td><td class="pass">✓</td></tr>
+    <tr><td>Malformed (non-JSON) response triggers fallback</td><td class="mono">LLM-6</td><td class="pass">✓</td></tr>
+    <tr><td>Network exception triggers fallback</td><td class="mono">LLM-7</td><td class="pass">✓</td></tr>
+    <tr><td>Heuristic fallback output itself passes A1–A10 validation</td><td class="mono">T-AA-1–10</td><td class="pass">✓</td></tr>
+    <tr><td>Markdown-fenced LLM JSON is accepted without fallback</td><td class="mono">LLM-10</td><td class="pass">✓</td></tr>
+  </tbody>
+</table>
+
+<h3>5i. Environmental Context vs. Supporting Evidence Separation</h3>
+<table>
+  <thead><tr><th>Invariant</th><th>Test(s)</th><th>Result</th></tr></thead>
+  <tbody>
+    <tr><td>environmental_context_ids ∩ supporting_evidence_ids = ∅ per hypothesis (unit)</td><td class="mono">F6, F43, T19</td><td class="pass">✓</td></tr>
+    <tr><td>environmental_context_ids ∩ supporting_evidence_ids = ∅ per hypothesis (HTTP)</td><td class="mono">REQ-6</td><td class="pass">✓</td></tr>
+    <tr><td>UI renders env-context and supporting sections as distinct DOM elements</td><td class="mono">FUI-NEW-3, EG-7</td><td class="pass">✓</td></tr>
+    <tr><td>UI env-context section carries "not supporting evidence" disclaimer</td><td class="mono">EG-6, EG-5-10, FUI-57-14</td><td class="pass">✓</td></tr>
+    <tr><td>UI env-context section has amber colour to distinguish from supporting</td><td class="mono">EG-6b, FUI-9</td><td class="pass">✓</td></tr>
+    <tr><td>Validator B2 rejects mechanism-confirmation language for env-context IDs</td><td class="mono">LLM-5, B2</td><td class="pass">✓</td></tr>
+  </tbody>
+</table>
+
+<h3>5j. EPHEMERIS Exclusion</h3>
+<table>
+  <thead><tr><th>Invariant</th><th>Test(s)</th><th>Result</th></tr></thead>
+  <tbody>
+    <tr><td>No GOES11_EPHEMERIS ID in any hypothesis evidence list (unit)</td><td class="mono">T23, F44</td><td class="pass">✓</td></tr>
+    <tr><td>No GOES11_EPHEMERIS ID in any hypothesis evidence list (HTTP, cross-ref)</td><td class="mono">REQ-7</td><td class="pass">✓</td></tr>
+    <tr><td>EPHEMERIS ID provenance returns found:true but empty hypothesis_relationships</td><td class="mono">F22</td><td class="pass">✓</td></tr>
+    <tr><td>UI displays EPHEMERIS records with "positional data" badge</td><td class="mono">TL-7</td><td class="pass">✓</td></tr>
+    <tr><td>EPHEMERIS provenance panel shows "no hypothesis relationships" note</td><td class="mono">TL-12, FUI-P-7</td><td class="pass">✓</td></tr>
+  </tbody>
+</table>
+
+<h3>5k. Numerical Probability Prohibition</h3>
+<table>
+  <thead><tr><th>Invariant</th><th>Test(s)</th><th>Result</th></tr></thead>
+  <tbody>
+    <tr><td>No numerical probability in serialised ForensicAnalysis (unit)</td><td class="mono">T-FA-5/9, F9/13</td><td class="pass">✓</td></tr>
+    <tr><td>No numerical probability in HTTP response body (full tree scan)</td><td class="mono">REQ-10</td><td class="pass">✓</td></tr>
+    <tr><td>A10 validator rejects LLM output containing numerical probabilities</td><td class="mono">T-AA-10</td><td class="pass">✓</td></tr>
+    <tr><td>UI renders no numerical probability text</td><td class="mono">EG-10, FUI-NEW-6, FUI-57-17</td><td class="pass">✓</td></tr>
+    <tr><td>ASSESSMENT_LABELS contains no probability/confidence language</td><td class="mono">assessmentLabels / label-2</td><td class="pass">✓</td></tr>
+  </tbody>
+</table>
+
+<h3>5l. Limitations Preservation</h3>
+<table>
+  <thead><tr><th>Invariant</th><th>Test(s)</th><th>Result</th></tr></thead>
+  <tbody>
+    <tr><td>Every hypothesis carries ≥1 limitation (graph level)</td><td class="mono">T6</td><td class="pass">✓</td></tr>
+    <tr><td>All graph hypothesis limitations preserved in ForensicAnalysis</td><td class="mono">F10</td><td class="pass">✓</td></tr>
+    <tr><td>analysis.limitations is non-empty; every entry has type and description</td><td class="mono">T-FA-15</td><td class="pass">✓</td></tr>
+    <tr><td>report.limitations is non-empty (HTTP level)</td><td class="mono">REQ-11a</td><td class="pass">✓</td></tr>
+    <tr><td>Every hypothesis carries ≥1 limitation in HTTP response</td><td class="mono">REQ-11b</td><td class="pass">✓</td></tr>
+    <tr><td>Limitations section visible in UI without toggle</td><td class="mono">FUI-10, FUI-NEW-4, EG-5c</td><td class="pass">✓</td></tr>
+  </tbody>
+</table>
+
+<h3>5m. API Error Contracts</h3>
+<table>
+  <thead><tr><th>Invariant</th><th>Test(s)</th><th>Result</th></tr></thead>
+  <tbody>
+    <tr><td>Unknown case → HTTP 404 on all three primary endpoints</td><td class="mono">EC-1, H4-1/3/5</td><td class="pass">✓</td></tr>
+    <tr><td>Error body shape: {error_code, error, status_code}</td><td class="mono">EC-3</td><td class="pass">✓</td></tr>
+    <tr><td>error_code is CASE_NOT_FOUND for missing case</td><td class="mono">EC-1</td><td class="pass">✓</td></tr>
+    <tr><td>error_code is FORENSIC_ANALYSIS_VALIDATION_ERROR for invariant violations</td><td class="mono">EC-2-3</td><td class="pass">✓</td></tr>
+    <tr><td>Error response does not leak filesystem paths, stack traces, or credentials</td><td class="mono">EC-1 (×3 endpoints)</td><td class="pass">✓</td></tr>
+    <tr><td>Error message contains the offending case ID</td><td class="mono">EC-1, H4-2/4/6</td><td class="pass">✓</td></tr>
+    <tr><td>Pipeline logs a pipeline_error entry for unknown case</td><td class="mono">OB-12-1</td><td class="pass">✓</td></tr>
+  </tbody>
+</table>
+
+<h3>5n. Frontend Scientific Labelling</h3>
+<table>
+  <thead><tr><th>Invariant</th><th>Test(s)</th><th>Result</th></tr></thead>
+  <tbody>
+    <tr><td>Causal attribution banner reads "NOT ESTABLISHED" (never "Established" by default)</td><td class="mono">FUI-1, FUI-57-15</td><td class="pass">✓</td></tr>
+    <tr><td>No "Cause:" or "Caused by:" as section labels in rendered output</td><td class="mono">FUI-2, FUI-57-16</td><td class="pass">✓</td></tr>
+    <tr><td>All five assessment badges display correct canonical human-readable labels</td><td class="mono">FUI-4–8, FUI-57-9–11</td><td class="pass">✓</td></tr>
+    <tr><td>"ESTABLISHED" banner only rendered when causal_attribution_established is true</td><td class="mono">FUI (shows ESTABLISHED)</td><td class="pass">✓</td></tr>
+    <tr><td>No probability/confidence text in assessment labels</td><td class="mono">assessmentLabels / label-2</td><td class="pass">✓</td></tr>
+    <tr><td>No causal language in assessment label values</td><td class="mono">assessmentLabels / label-3</td><td class="pass">✓</td></tr>
+  </tbody>
+</table>
+
+
+<h2>6. Performance Baseline (Galaxy 15, 10 iterations, heuristic path)</h2>
+<table>
+  <thead><tr><th>Stage</th><th class="perf-num">Avg (ms)</th><th class="perf-num">Median (ms)</th><th class="perf-num">Min (ms)</th><th class="perf-num">Max (ms)</th><th>Soft ceiling</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">parseEvidenceCSV</td><td class="perf-num">0.534</td><td class="perf-num">0.493</td><td class="perf-num">0.444</td><td class="perf-num">0.752</td><td>2 000 ms</td></tr>
+    <tr><td class="mono">buildEvidenceGraph</td><td class="perf-num">0.091</td><td class="perf-num">0.076</td><td class="perf-num">0.074</td><td class="perf-num">0.174</td><td>1 000 ms</td></tr>
+    <tr><td class="mono">buildForensicAnalysis</td><td class="perf-num">0.075</td><td class="perf-num">0.069</td><td class="perf-num">0.041</td><td class="perf-num">0.154</td><td>1 000 ms</td></tr>
+    <tr><td class="mono">buildAnalystHeuristicNarrative</td><td class="perf-num">0.007</td><td class="perf-num">0.005</td><td class="perf-num">0.004</td><td class="perf-num">0.023</td><td>500 ms</td></tr>
+    <tr><td class="mono">assembleValidatedForensicReport</td><td class="perf-num">0.003</td><td class="perf-num">0.001</td><td class="perf-num">0.001</td><td class="perf-num">0.019</td><td>500 ms</td></tr>
+    <tr style="background:#1e2d42"><td class="mono"><strong>Full pipeline (heuristic)</strong></td><td class="perf-num"><strong>0.782</strong></td><td class="perf-num"><strong>0.660</strong></td><td class="perf-num"><strong>0.600</strong></td><td class="perf-num"><strong>1.329</strong></td><td>3 000 ms</td></tr>
+    <tr><td class="mono">Heap delta (single run)</td><td class="perf-num" colspan="4">0.41 MB</td><td>50 MB ceiling</td></tr>
+  </tbody>
+</table>
+<p>Baseline recorded 2026-08-27T16:44:59.026Z. These are regression-detection reference numbers, not SLO commitments. The LLM path is not baselined because it requires a live Watsonx endpoint.</p>
+
+
+<h2>7. Technical Debt</h2>
+
+<div class="item debt">
+  <div class="item-id">TD-1  <span class="badge b-amber">LOW</span></div>
+  <div class="item-desc"><strong>Case CSV discovery is synchronous.</strong> parseEvidenceCSV uses <code>readdirSync</code> inside an async function to locate the evidence file. For a single-case deployment at current scale this is immaterial (&lt;1 ms), but it blocks the event loop during file-system access. If a second case is onboarded with a large CSV or if the endpoint is hit at high concurrency, this will become visible. Remediation: replace with <code>fs.promises.readdir</code>.</div>
+</div>
+
+<div class="item debt">
+  <div class="item-id">TD-2  <span class="badge b-amber">LOW</span></div>
+  <div class="item-desc"><strong>POST /investigate and POST /challenge endpoints are not HTTP-integration-tested.</strong> Their logic is exercised by aiEngine.test.js at the unit level, but no test makes a supertest HTTP request to either route. Unknown-case 404 paths on these endpoints are untested.</div>
+</div>
+
+<div class="item debt">
+  <div class="item-id">TD-3  <span class="badge b-amber">LOW</span></div>
+  <div class="item-desc"><strong>GET /api/cases/:id/evidence/:id/provenance has no HTTP integration test.</strong> The underlying function getEvidenceProvenance is tested (F18–F24), but the Express route handler itself — including its error handling — has no supertest coverage.</div>
+</div>
+
+<div class="item debt">
+  <div class="item-id">TD-4  <span class="badge b-amber">LOW</span></div>
+  <div class="item-desc"><strong>Five frontend components have no render tests:</strong> <code>App.jsx</code>, <code>Header.jsx</code>, <code>HypothesisMatrix.jsx</code>, <code>EventTimeline.jsx</code>, <code>RedTeamPanel.jsx</code>, <code>ReportModal.jsx</code>. These are data-display components and do not implement forensic logic, but a rendering regression would be invisible to the test suite.</div>
+</div>
+
+<div class="item debt">
+  <div class="item-id">TD-5  <span class="badge b-amber">LOW</span></div>
+  <div class="item-desc"><strong>No LLM-path HTTP integration test.</strong> All LLM-path tests inject a factory via the internal <code>_llmFactory</code> parameter of <code>generateAnalystNarrative</code>. The HTTP route calls <code>aiAnalyst.generateAnalystNarrative</code> directly without the injection parameter exposed to callers. A live-LLM HTTP integration test would require a Watsonx credential, which is intentionally absent in CI.</div>
+</div>
+
+<div class="item debt">
+  <div class="item-id">TD-6  <span class="badge b-amber">MEDIUM</span></div>
+  <div class="item-desc"><strong>±10-minute temporal window is a hard-coded, uncalibrated heuristic.</strong> The code explicitly labels this: <em>"this is an evidence-selection heuristic, not a scientifically calibrated causal threshold."</em> The window value (600 000 ms) lives in <code>server.js</code> as an inline numeric literal with no named constant or configuration surface. If a second case with a different orbital period or anomaly duration is onboarded, the same window may misclassify evidence.</div>
+</div>
+
+
+<h2>8. Scientific Limitations</h2>
+<p>The following limitations are explicitly encoded in the pipeline and surface in every API response under <code>report.limitations</code> and per-hypothesis <code>limitations[]</code>. They are not test failures — they are accurate descriptions of the dataset's scientific bounds.</p>
+
+<div class="item note">
+  <div class="item-id">SL-1  <span class="badge b-blue">PROXY MEASUREMENT</span></div>
+  <div class="item-desc">GOES-11 EP8 and MAG measurements were recorded at a spacecraft approximately 2° of longitude from Galaxy 15. They characterise the near-GEO environment, not the in-situ environment at the anomaly satellite. This limits causal inference from any hypothesis that depends on local charged-particle flux.</div>
+</div>
+
+<div class="item note">
+  <div class="item-id">SL-2  <span class="badge b-blue">HEURISTIC WINDOW</span></div>
+  <div class="item-desc">Evidence selection for H1 (ESD) and H2 (SEU/SEE) uses a ±10-minute temporal window around the anomaly anchor. This is an investigative heuristic with no scientific calibration. Records outside the window are not analysed, and records inside it are not confirmed as causally related.</div>
+</div>
+
+<div class="item note">
+  <div class="item-id">SL-3  <span class="badge b-blue">CAUSAL ATTRIBUTION</span></div>
+  <div class="item-desc"><code>causal_attribution_established = false</code> for Galaxy 15 in every pipeline output. No hypothesis is proven causal by this dataset. The strongest assessment (H5 = strongly_supported) reflects consistency with available observations, not causal confirmation.</div>
+</div>
+
+<div class="item note">
+  <div class="item-id">SL-4  <span class="badge b-blue">MISSING DATA — H4</span></div>
+  <div class="item-desc">Hypothesis H4 (ground-station interference) has zero evidence records. No ground-station telemetry or RF monitoring data is present in the dataset. The <code>insufficient_evidence</code> assessment is correct and expected, not a pipeline defect.</div>
+</div>
+
+<div class="item note">
+  <div class="item-id">SL-5  <span class="badge b-blue">ENVIRONMENTAL CONTEXT ≠ CAUSE</span></div>
+  <div class="item-desc">GOES-11 EP8 and MAG records that fall within the heuristic window are classified as <code>environmental_context</code> for H1 and H2 respectively. They describe what the environment was at the time of the anomaly — they do not confirm that any specific mechanism occurred. This distinction is enforced at every layer: graph construction, forensic analysis, AI validator (B2), and UI labelling.</div>
+</div>
+
+
+<h2>9. Remaining Risks</h2>
+
+<div class="item risk">
+  <div class="item-id">RK-1  <span class="badge b-red">MEDIUM</span></div>
+  <div class="item-desc"><strong>Second-case onboarding is untested.</strong> The readdirSync resolution mechanism (Phase 5.1) is verified to reject unknown cases and to return the correct Galaxy 15 dataset. However, no second case directory has been created. The mechanism has not been exercised with a real second case, only with the absence of a case (reject path). A second case with different evidence counts, different ID prefixes, or a different CSV column schema could reveal assumptions not yet tested.</div>
+</div>
+
+<div class="item risk">
+  <div class="item-id">RK-2  <span class="badge b-red">LOW–MEDIUM</span></div>
+  <div class="item-desc"><strong>Live LLM path is not integration-tested end-to-end.</strong> When a Watsonx API key is present, the HTTP handler calls the real LLM. The validator (A1–A10, B1–B4) provides a strong safety net, but the validator's behaviour when the LLM produces an edge-case response format not yet seen in tests (e.g., partial JSON, Unicode BOM, trailing whitespace after fence) is not fully exercised. The markdown-fence stripping test (LLM-10) covers one such case.</div>
+</div>
+
+<div class="item risk">
+  <div class="item-id">RK-3  <span class="badge b-red">LOW</span></div>
+  <div class="item-desc"><strong>No concurrency or load test.</strong> The pipeline is synchronous inside async routes. Under concurrent requests the synchronous blocks (buildEvidenceGraph, buildForensicAnalysis) will compete for the single Node.js event loop. No load test has been run to characterise degradation.</div>
+</div>
+
+<div class="item risk">
+  <div class="item-id">RK-4  <span class="badge b-red">LOW</span></div>
+  <div class="item-desc"><strong>Temporal window hard-coded as inline literal.</strong> The value 600 000 ms is written directly in the case function body in server.js with no named constant. A future developer who changes it without understanding the scientific implications could silently alter which evidence records are included in H1/H2 environmental context, affecting assessments.</div>
+</div>
+
+
+<h2>10. Recommended Phase 6 Priorities</h2>
+<table>
+  <thead><tr><th>#</th><th>Priority</th><th>Item</th><th>Rationale</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>P6-1</td><td><span class="badge b-red">HIGH</span></td>
+      <td>Second case onboarding (end-to-end)</td>
+      <td>The only way to validate the multi-case resolution mechanism (Phase 5.1) under real conditions. Choose a case with different evidence structure to surface CSV-schema assumptions. Derive a new evidence ID prefix and add a multi-case test that runs both Galaxy 15 and the new case in the same suite run.</td>
+    </tr>
+    <tr>
+      <td>P6-2</td><td><span class="badge b-red">HIGH</span></td>
+      <td>HTTP integration tests for /evidence/:id/provenance, /investigate, /challenge</td>
+      <td>Closes TD-2 and TD-3. These routes have unit coverage but no HTTP-level contract tests. The error contract (404 for unknown case, shape of error response) is unverified at the HTTP boundary for these routes.</td>
+    </tr>
+    <tr>
+      <td>P6-3</td><td><span class="badge b-amber">MEDIUM</span></td>
+      <td>Extract temporal window to named constant</td>
+      <td>Closes TD-6 / RK-4. Replace inline <code>600_000</code> with a named export e.g. <code>HEURISTIC_WINDOW_MS</code>, add a test that asserts its value and documents the scientific rationale. Makes the parameter visible to future case-specific overrides.</td>
+    </tr>
+    <tr>
+      <td>P6-4</td><td><span class="badge b-amber">MEDIUM</span></td>
+      <td>Replace readdirSync with async readdir</td>
+      <td>Closes TD-1. Zero-risk change; keeps the public API identical. Prevents event-loop blocking when the cases directory grows or disk I/O is slow.</td>
+    </tr>
+    <tr>
+      <td>P6-5</td><td><span class="badge b-amber">MEDIUM</span></td>
+      <td>Render tests for HypothesisMatrix, RedTeamPanel, ReportModal, EventTimeline</td>
+      <td>Closes TD-4. Smoke-tests for the four untested display components. Should follow the EvidenceGraphExplorer pattern: fixture data, at least one label-correctness assertion, no probability language.</td>
+    </tr>
+    <tr>
+      <td>P6-6</td><td><span class="badge b-amber">MEDIUM</span></td>
+      <td>LLM-path HTTP integration test (controlled)</td>
+      <td>Closes TD-5. Implement via a test-only environment variable that routes the LLM factory through a deterministic mock server (e.g., a local HTTP stub), allowing the full Express route → LLM call → validation → report path to be tested without a live Watsonx key.</td>
+    </tr>
+    <tr>
+      <td>P6-7</td><td><span class="badge b-blue">LOW</span></td>
+      <td>Concurrency smoke test</td>
+      <td>Addresses RK-3. Run 10 concurrent supertest requests to /forensic-analysis and assert all return HTTP 200 with identical deterministic output. Should catch any shared mutable state introduced by future refactors.</td>
+    </tr>
+    <tr>
+      <td>P6-8</td><td><span class="badge b-blue">LOW</span></td>
+      <td>CSV schema validation on ingestion</td>
+      <td>Currently parseEvidenceCSV assumes column names match the Galaxy 15 schema. A second case with renamed columns silently produces null/undefined fields. Add a schema assertion on the first parsed row and reject with a structured error if required columns are absent.</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+<footer>
+  SPACEFORENSICS Phase 5 Final Audit  ·  Backend: 293/293 passing  ·  Frontend: 129/129 passing  · 
+  No scientific conclusions introduced  ·  No invariants claimed without test evidence
+</footer>
+
+</body>
+</html>

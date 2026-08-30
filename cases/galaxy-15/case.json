@@ -1,5 +1,6 @@
 {
   "case_id": "galaxy-15",
+  "id_prefix": "G15",
   "title": "Galaxy 15 Satellite Anomaly — April 2010",
   "description": "On 2010-04-05T09:48:00Z, Galaxy 15 became unresponsive to ground commands. The anomaly occurred during disturbed geomagnetic and energetic-particle conditions. The spacecraft continued transmitting and remained otherwise operational. The role of the space environment in producing the anomaly is an open investigation question.",
   "causal_attribution": "Causal attribution is not established by the available evidence.",

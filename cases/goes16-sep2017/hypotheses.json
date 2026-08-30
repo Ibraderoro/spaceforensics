@@ -1,0 +1,126 @@
+{
+  "causal_attribution_established": false,
+  "heuristic_window_minutes": 10,
+  "heuristic_window_note": "MVP temporal selection window of ±10 minutes around the anomaly timestamp; this is an evidence-selection heuristic, not a scientifically calibrated causal threshold.",
+  "source_roles": {
+    "anchor":    "CASE",
+    "env_p":     "GOES16_SGPS",
+    "env_e":     "GOES16_MPSH"
+  },
+  "ref_templates": {
+    "anchor_non_discriminating": {
+      "relationship": "instrument_safe_mode_consistent_with_multiple_mechanisms",
+      "interpretation": "The anchor event (EXIS instrument safe mode) is consistent with multiple failure mechanisms — SEP-induced single-event effects, unrelated software faults, or hardware conditions — and does not by itself discriminate among them."
+    },
+    "anchor_supporting_persistent_fault": {
+      "relationship": "instrument_safe_mode_requiring_ground_recovery",
+      "interpretation": "The requirement for a ground command recovery sequence is consistent with a persistent instrument-level fault, but does not establish whether the underlying mechanism was an SEP-induced upset, a firmware condition, or another failure mode."
+    },
+    "anchor_supporting_unresolved": {
+      "relationship": "anomaly_unresolved_after_investigation",
+      "interpretation": "The anchor event documents a persistent instrument anomaly whose causal mechanism is not established by the available environmental or spacecraft data."
+    },
+    "env_p_window": {
+      "relationship": "proton_flux_environment_at_anomaly_time",
+      "interpretation": "GOES-16 SGPS P1-channel proton flux measurements within the ±10-minute heuristic investigation window establish that a significant proton flux environment existed contemporaneous with the anomaly. This is a precondition observation — it documents what the environment was, not that a specific SEP-induced mechanism occurred. The SGPS sensor is a separate instrument from EXIS on the same spacecraft bus."
+    },
+    "env_e_window": {
+      "relationship": "energetic_electron_environment_at_anomaly_time",
+      "interpretation": "GOES-16 MPSH differential particle flux measurements within the ±10-minute heuristic investigation window document the energetic particle environment contemporaneous with the anomaly. These observations contextualise the SEP event intensity. The MPSH sensor is a separate instrument from EXIS; the measured flux is at the spacecraft bus, not at the EXIS optical bench."
+    }
+  },
+  "hypotheses": [
+    {
+      "hypothesis_id": "H1",
+      "label": "SEP-induced single-event effect in EXIS command/control electronics",
+      "description": "An energetic proton from the September 2017 SEP event traversed the EXIS command processor or power-conditioning integrated circuit, causing a single-event upset (SEU) or latchup that triggered the instrument's autonomous safe mode.",
+      "assessment": "mixed",
+      "heuristic_note": "use_global",
+      "evidence_rules": {
+        "environmental_context":       ["env_p_window", "env_e_window"],
+        "supporting_evidence":         [],
+        "contradicting_evidence":      [],
+        "non_discriminating_evidence": ["anchor_non_discriminating"]
+      },
+      "limitations": [
+        {
+          "type": "proxy_measurement",
+          "description": "The SGPS and MPSH sensors measure the external particle environment at the spacecraft bus. The flux at the EXIS circuit level depends on shielding geometry, which is not characterised in this dataset."
+        },
+        {
+          "type": "missing_data",
+          "description": "No onboard SEU event counter or latchup protection status telemetry from the EXIS instrument is present in this dataset."
+        },
+        {
+          "type": "unresolved",
+          "description": "GOES-16 was in on-orbit checkout phase; instrument susceptibility parameters (critical charge, shielding thickness) from the as-built design are not publicly available."
+        }
+      ]
+    },
+    {
+      "hypothesis_id": "H2",
+      "label": "Unrelated EXIS firmware or software condition",
+      "description": "A fault internal to the EXIS firmware or onboard software — independent of the external particle environment — triggered the safe mode transition. The temporal coincidence with the SEP event is coincidental.",
+      "assessment": "mixed",
+      "heuristic_note": null,
+      "evidence_rules": {
+        "environmental_context":       [],
+        "supporting_evidence":         [],
+        "contradicting_evidence":      [],
+        "non_discriminating_evidence": ["anchor_non_discriminating"]
+      },
+      "limitations": [
+        {
+          "type": "missing_data",
+          "description": "No EXIS onboard software or firmware fault log data is present in this dataset. This hypothesis cannot be confirmed or excluded without instrument-level telemetry."
+        },
+        {
+          "type": "unresolved",
+          "description": "The coincidence of timing with the SEP event onset neither confirms nor excludes a software-only explanation. Both hypotheses H1 and H2 are consistent with the observed data."
+        }
+      ]
+    },
+    {
+      "hypothesis_id": "H3",
+      "label": "EXIS instrument safe mode from ground command or uplink event",
+      "description": "The EXIS safe mode was triggered by an anomalous ground command, an uplink error, or a commanding system condition rather than by an onboard fault or the space environment.",
+      "assessment": "insufficient_evidence",
+      "heuristic_note": null,
+      "evidence_rules": {
+        "environmental_context":       [],
+        "supporting_evidence":         [],
+        "contradicting_evidence":      [],
+        "non_discriminating_evidence": []
+      },
+      "limitations": [
+        {
+          "type": "missing_data",
+          "description": "No ground-segment commanding logs, uplink monitoring data, or RF link telemetry are present in this dataset. This hypothesis cannot be evaluated from the available evidence."
+        }
+      ]
+    },
+    {
+      "hypothesis_id": "H4",
+      "label": "Insufficient evidence for causal attribution",
+      "description": "The available evidence is insufficient to establish a causal mechanism for the GOES-16 EXIS safe mode. This is a legitimate outcome of the investigation, not a failure to analyse.",
+      "assessment": "strongly_supported",
+      "heuristic_note": null,
+      "evidence_rules": {
+        "environmental_context":       [],
+        "supporting_evidence":         ["anchor_supporting_unresolved"],
+        "contradicting_evidence":      [],
+        "non_discriminating_evidence": []
+      },
+      "limitations": [
+        {
+          "type": "unresolved",
+          "description": "Causal attribution is not established by the available evidence. H1 (SEP-induced upset) and H2 (software/firmware fault) remain equally plausible and cannot be discriminated without instrument-level telemetry."
+        },
+        {
+          "type": "missing_data",
+          "description": "Key discriminating data — EXIS onboard fault logs, SEU event counters, and latchup protection telemetry — are absent from this dataset."
+        }
+      ]
+    }
+  ]
+}

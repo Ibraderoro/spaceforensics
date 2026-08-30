@@ -3,35 +3,66 @@ import { Loader2, FlaskConical, FileText } from "lucide-react";
 import Header from "./components/Header";
 import EventTimeline from "./components/EventTimeline";
 import HypothesisMatrix from "./components/HypothesisMatrix";
+import ForensicInvestigationView from "./components/ForensicInvestigationView";
 import RedTeamPanel from "./components/RedTeamPanel";
 import ReportModal from "./components/ReportModal";
-import { fetchCaseMeta, fetchTimeline, postInvestigate } from "./api";
+import InvestigationTimeline from "./components/InvestigationTimeline";
+import EvidenceGraphExplorer from "./components/EvidenceGraphExplorer";
+import InvestigationWorkspace from "./components/InvestigationWorkspace";
+import { fetchCaseMeta, fetchTimeline, fetchEvidenceGraph, fetchForensicAnalysis, postInvestigate, fetchCaseList } from "./api";
 
 export default function App() {
-  const [caseMeta,       setCaseMeta]       = useState(null);
-  const [timelineData,   setTimelineData]   = useState([]);
-  const [hypotheses,     setHypotheses]     = useState(null);
-  const [challengeData,  setChallengeData]  = useState(null);
-  const [showReport,     setShowReport]     = useState(false);
-  const [loading,        setLoading]        = useState(true);
-  const [investigating,  setInvestigating]  = useState(false);
-  const [initError,      setInitError]      = useState(null);
+  const [caseMeta,         setCaseMeta]         = useState(null);
+  const [timelineData,     setTimelineData]     = useState([]);
+  const [hypotheses,       setHypotheses]       = useState(null);
+  const [challengeData,    setChallengeData]    = useState(null);
+  const [showReport,       setShowReport]       = useState(false);
+  const [loading,          setLoading]          = useState(true);
+  const [investigating,    setInvestigating]    = useState(false);
+  const [initError,        setInitError]        = useState(null);
+  const [forensicReport,   setForensicReport]   = useState(null);
+  const [evidenceGraph,    setEvidenceGraph]     = useState(null);
+  const [forensicLoading,  setForensicLoading]  = useState(true);
+  const [forensicError,    setForensicError]    = useState(null);
+  const [selectedCaseId,   setSelectedCaseId]   = useState("galaxy-15");
+  const [caseList,         setCaseList]         = useState([]);
 
-  // Load case metadata + timeline on mount
+  // Load case metadata + timeline on mount (critical path); re-runs when selectedCaseId changes
   useEffect(() => {
-    Promise.all([fetchCaseMeta(), fetchTimeline()])
-      .then(([meta, timeline]) => {
+    setLoading(true);
+    setInitError(null);
+    Promise.all([fetchCaseMeta(selectedCaseId), fetchTimeline(selectedCaseId), fetchCaseList()])
+      .then(([meta, timeline, cases]) => {
         setCaseMeta(meta);
         setTimelineData(timeline);
+        setCaseList(cases);
       })
       .catch((err) => setInitError(err.message))
       .finally(() => setLoading(false));
-  }, []);
+  }, [selectedCaseId]);
+
+  // Load forensic analysis + evidence graph in parallel (non-blocking); re-runs on case change
+  useEffect(() => {
+    setForensicLoading(true);
+    setForensicError(null);
+    setForensicReport(null);
+    setEvidenceGraph(null);
+    Promise.allSettled([fetchForensicAnalysis(selectedCaseId), fetchEvidenceGraph(selectedCaseId)])
+      .then(([forensicResult, graphResult]) => {
+        if (forensicResult.status === "fulfilled") setForensicReport(forensicResult.value);
+        if (graphResult.status === "fulfilled")    setEvidenceGraph(graphResult.value);
+        // Surface an error only when both fail — a partial result is still useful.
+        if (forensicResult.status === "rejected" && graphResult.status === "rejected") {
+          setForensicError("Forensic analysis unavailable — could not reach the API. Verify the backend is running.");
+        }
+      })
+      .finally(() => setForensicLoading(false));
+  }, [selectedCaseId]);
 
   async function handleInvestigate() {
     setInvestigating(true);
     try {
-      const result = await postInvestigate();
+      const result = await postInvestigate(selectedCaseId);
       setHypotheses(result.hypotheses);
     } catch (err) {
       console.error("Investigate error:", err);
@@ -72,6 +103,21 @@ export default function App() {
     <div className="min-h-screen bg-slate-950 text-slate-100">
       <Header caseMeta={caseMeta} />
 
+      {/* Case selector — only visible when more than one case is available */}
+      {caseList.length > 1 && (
+        <div className="flex justify-center py-2 bg-slate-900 border-b border-slate-800">
+          <select
+            value={selectedCaseId}
+            onChange={(e) => setSelectedCaseId(e.target.value)}
+            className="font-mono text-xs bg-slate-800 text-slate-300 border border-slate-600 rounded px-3 py-1"
+          >
+            {caseList.map((c) => (
+              <option key={c.case_id} value={c.case_id}>{c.title || c.case_id}</option>
+            ))}
+          </select>
+        </div>
+      )}
+
       <main className="max-w-screen-2xl mx-auto px-4 md:px-6 py-6">
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
@@ -82,6 +128,14 @@ export default function App() {
             <EventTimeline
               timelineData={timelineData}
               anchorTimestamp={caseMeta?.anchor_event?.timestamp}
+            />
+
+            {/* Investigation Timeline — full record list with provenance */}
+            <InvestigationTimeline
+              timelineData={timelineData}
+              anchorTimestamp={caseMeta?.anchor_event?.timestamp}
+              reportHypotheses={forensicReport?.hypotheses ?? []}
+              caseId={selectedCaseId}
             />
 
             {/* Investigate button */}
@@ -115,6 +169,40 @@ export default function App() {
               timelineData={timelineData}
               caseMeta={caseMeta}
             />
+
+            {/* Forensic Investigation View */}
+            {forensicLoading ? (
+              <div
+                data-testid="forensic-loading"
+                className="bg-slate-900 rounded-xl p-6 border border-slate-700 flex items-center gap-3"
+              >
+                <Loader2 className="w-4 h-4 text-cyan-400 animate-spin shrink-0" />
+                <p className="font-mono text-xs text-slate-500">Loading forensic analysis…</p>
+              </div>
+            ) : forensicError ? (
+              <div
+                data-testid="forensic-error"
+                className="bg-slate-900 rounded-xl p-6 border border-red-800/60 flex flex-col gap-2"
+              >
+                <p className="font-mono text-sm font-semibold text-red-400">Forensic analysis unavailable</p>
+                <p className="font-mono text-xs text-slate-400">{forensicError}</p>
+              </div>
+            ) : (
+              <>
+                <ForensicInvestigationView
+                  report={forensicReport}
+                  timelineData={timelineData}
+                  evidenceGraph={evidenceGraph}
+                />
+                <EvidenceGraphExplorer
+                  evidenceGraph={evidenceGraph}
+                  forensicReport={forensicReport}
+                />
+              </>
+            )}
+
+            {/* Investigation Workspace — Phase 7 analyst layer */}
+            <InvestigationWorkspace caseId={selectedCaseId} />
           </div>
 
           {/* ── Right column (red-team + export) ── */}
@@ -145,7 +233,7 @@ export default function App() {
                   <dt className="text-slate-500">Case ID</dt>
                   <dd className="text-slate-300">{caseMeta.case_id}</dd>
                   <dt className="text-slate-500">Anchor Event</dt>
-                  <dd className="text-amber-400">09:48:00 UTC</dd>
+                  <dd className="text-amber-400">{caseMeta.anchor_event?.timestamp ?? "—"}</dd>
                   <dt className="text-slate-500">Records</dt>
                   <dd className="text-slate-300">{timelineData.length}</dd>
                   <dt className="text-slate-500">NORAD ID</dt>

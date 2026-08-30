@@ -237,9 +237,9 @@ test('T-AI-10: validatePass2Response rejects a hallucinated counter_evidence_id'
 // ─────────────────────────────────────────────────────────────────────────────
 // T-AI-11: buildEvidenceSnapshot produces an evidence_index with only valid IDs
 // ─────────────────────────────────────────────────────────────────────────────
-test('T-AI-11: buildEvidenceSnapshot evidence_index contains only valid evidence_ids', () => {
+test('T-AI-11: buildEvidenceSnapshot evidence_index contains only valid evidence_ids', async () => {
   const validIds = new Set(rows.map((r) => r.evidence_id));
-  const snapshot = buildEvidenceSnapshot(rows, CASE_ID);
+  const snapshot = await buildEvidenceSnapshot(rows, CASE_ID);
 
   expect(Array.isArray(snapshot.evidence_index)).toBe(true);
   expect(snapshot.evidence_index.length).toBeGreaterThan(0);
@@ -258,8 +258,8 @@ test('T-AI-11: buildEvidenceSnapshot evidence_index contains only valid evidence
 // ─────────────────────────────────────────────────────────────────────────────
 // T-AI-12: CASE anchor rows are always included in the evidence_index
 // ─────────────────────────────────────────────────────────────────────────────
-test('T-AI-12: CASE anchor rows are unconditionally included in the evidence_index', () => {
-  const snapshot   = buildEvidenceSnapshot(rows, CASE_ID);
+test('T-AI-12: CASE anchor rows are unconditionally included in the evidence_index', async () => {
+  const snapshot   = await buildEvidenceSnapshot(rows, CASE_ID);
   const caseInRows = rows.filter((r) => r.source === 'CASE').map((r) => r.evidence_id);
   const idxIds     = new Set(snapshot.evidence_index.map((e) => e.evidence_id));
 

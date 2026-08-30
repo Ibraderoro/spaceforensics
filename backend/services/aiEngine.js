@@ -4,6 +4,7 @@ require('dotenv').config();
 
 const path = require('path');
 const fs   = require('fs');
+const { FORENSIC_TEMPORAL_WINDOW_MINUTES } = require('./forensicConfig');
 
 // ---------------------------------------------------------------------------
 // LLM client factory — returns a ChatWatsonx instance or null when no key
@@ -28,7 +29,12 @@ function buildLLMClient() {
 // ---------------------------------------------------------------------------
 const ANOMALY_TIME       = new Date('2010-04-05T09:48:00Z').getTime();
 const ELEVATED_FLUX_THRESHOLD = 1000;
-const MAG_WINDOW_MS      = 10 * 60 * 1000;  // ±10 minutes
+// Evidence-selection heuristic — NOT a scientifically calibrated causal threshold.
+// Defines the ±N-minute band around the anomaly used to select temporally proximate
+// environmental measurements for the heuristic narrative fallback.
+// Canonical value is FORENSIC_TEMPORAL_WINDOW_MINUTES from forensicConfig.js.
+const TEMPORAL_SELECTION_WINDOW_MINUTES = FORENSIC_TEMPORAL_WINDOW_MINUTES;
+const MAG_WINDOW_MS      = TEMPORAL_SELECTION_WINDOW_MINUTES * 60 * 1000;
 const SNAPSHOT_WINDOW_MS = 30 * 60 * 1000;  // ±30 minutes for token-safe window
 
 function classifyEvidence(rows) {
@@ -73,7 +79,7 @@ function classifyEvidence(rows) {
 // ST-1: Evidence snapshot builder
 // Produces a token-safe, ID-addressable view of the evidence for the LLM.
 // ---------------------------------------------------------------------------
-function buildEvidenceSnapshot(rows, caseId) {
+async function buildEvidenceSnapshot(rows, caseId) {
   const metrics = classifyEvidence(rows);
 
   // ---- Build the evidence_index with a ≤150-row token budget ----
@@ -130,7 +136,7 @@ function buildEvidenceSnapshot(rows, caseId) {
   let scientificLimitations = [];
   try {
     const casePath = path.join(__dirname, '..', '..', 'cases', caseId, 'case.json');
-    const caseJson = JSON.parse(fs.readFileSync(casePath, 'utf8'));
+    const caseJson = JSON.parse(await fs.promises.readFile(casePath, 'utf8'));
     scientificLimitations = caseJson.scientific_limitations || [];
   } catch (_) {
     // If the file can't be read, proceed without limitations
@@ -706,7 +712,7 @@ Produce the JSON red-team challenge object now.`;
 // ST-6: Pass 1 — generate competing hypotheses
 // ---------------------------------------------------------------------------
 async function generateHypothesesPass(evidenceStream) {
-  const snapshot   = buildEvidenceSnapshot(evidenceStream, 'galaxy-15');
+  const snapshot   = await buildEvidenceSnapshot(evidenceStream, 'galaxy-15');
   const allowedIds = new Set(evidenceStream.map((r) => r.evidence_id).filter(Boolean));
   const llm        = buildLLMClient();
 
@@ -769,7 +775,7 @@ async function generateHypothesesPass(evidenceStream) {
 // ST-6: Pass 2 — red-team challenge
 // ---------------------------------------------------------------------------
 async function redTeamChallengePass(leadingHypothesis, evidenceStream) {
-  const snapshot   = buildEvidenceSnapshot(evidenceStream, 'galaxy-15');
+  const snapshot   = await buildEvidenceSnapshot(evidenceStream, 'galaxy-15');
   const allowedIds = new Set(evidenceStream.map((r) => r.evidence_id).filter(Boolean));
   const llm        = buildLLMClient();
 

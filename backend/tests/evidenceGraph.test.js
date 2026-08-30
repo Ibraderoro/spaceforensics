@@ -13,7 +13,7 @@ let validIds;
 
 beforeAll(async () => {
   rows    = await parseEvidenceCSV(CASE_ID);
-  graph   = buildEvidenceGraph(CASE_ID, rows);
+  graph   = await buildEvidenceGraph(CASE_ID, rows);
   validIds = new Set(rows.map((r) => r.evidence_id));
 });
 

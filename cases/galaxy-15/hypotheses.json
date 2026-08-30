@@ -1,0 +1,153 @@
+{
+  "causal_attribution_established": false,
+  "heuristic_window_minutes": 10,
+  "heuristic_window_note": "MVP temporal selection window of ±10 minutes around the anomaly timestamp; this is an evidence-selection heuristic, not a scientifically calibrated causal threshold.",
+  "source_roles": {
+    "anchor":    "CASE",
+    "env_ep8":   "GOES11_EP8",
+    "env_mag":   "GOES11_MAG"
+  },
+  "ref_templates": {
+    "anchor_non_discriminating": {
+      "relationship": "command_loss_consistent_with_multiple_mechanisms",
+      "interpretation": "The anchor event (loss of ground command contact) is consistent with multiple failure mechanisms and does not by itself discriminate among them."
+    },
+    "anchor_supporting_persistent_fault": {
+      "relationship": "persistent_command_unresponsiveness",
+      "interpretation": "Extended command unresponsiveness is consistent with a persistent command-system fault, but does not establish whether the underlying mechanism was hardware, software, latchup, or another failure mode."
+    },
+    "anchor_supporting_unresolved": {
+      "relationship": "anomaly_unresolved_after_investigation",
+      "interpretation": "The anchor event documents a persistent anomaly whose causal mechanism is not established by the available environmental or spacecraft data."
+    },
+    "env_ep8_window": {
+      "relationship": "energetic_particle_environment_at_anomaly_time",
+      "interpretation": "GOES-11 EP8 1 MeV electron flux measured within the ±10-minute heuristic investigation window establishes that an energetic-particle environment existed contemporaneous with the anomaly. This is a precondition observation — it documents what the environment was, not that a specific mechanism occurred. GOES-11 is a proxy measurement ~2° of longitude from Galaxy 15; direct in-situ flux at the spacecraft bus is unavailable."
+    },
+    "env_mag_window": {
+      "relationship": "geomagnetic_conditions_at_anomaly_time",
+      "interpretation": "GOES-11 MAG B_GSM measurements within the ±10-minute heuristic investigation window document geomagnetic field conditions contemporaneous with the anomaly. These observations contextualise the space weather environment. B_GSM is the local field at GOES-11 orbit, not at the Galaxy 15 spacecraft body; no magnetometer was onboard Galaxy 15. Geomagnetic field magnitude does not directly support or exclude an SEU or latchup mechanism — that determination requires particle flux data."
+    }
+  },
+  "hypotheses": [
+    {
+      "hypothesis_id": "H1",
+      "label": "Spacecraft charging / electrostatic discharge",
+      "description": "Differential charging of spacecraft surfaces by sustained high-energy electron flux leading to an electrostatic discharge event that affected the command receiver or command-processing subsystem.",
+      "assessment": "mixed",
+      "heuristic_note": "use_global",
+      "evidence_rules": {
+        "environmental_context":       ["env_ep8_window"],
+        "supporting_evidence":         [],
+        "contradicting_evidence":      [],
+        "non_discriminating_evidence": ["anchor_non_discriminating"]
+      },
+      "limitations": [
+        {
+          "type": "unresolved",
+          "description": "Continued nominal attitude behavior does not independently confirm a spacecraft-wide electrical disturbance and does not by itself rule out a localized charging/ESD event."
+        },
+        {
+          "type": "proxy_measurement",
+          "description": "GOES-11 EP8 measurements are a proxy ~2° of longitude from Galaxy 15. Direct in-situ particle flux at the spacecraft bus is unavailable."
+        },
+        {
+          "type": "missing_data",
+          "description": "No spacecraft surface-charging telemetry or onboard electrostatic monitoring data is available in this dataset."
+        }
+      ]
+    },
+    {
+      "hypothesis_id": "H2",
+      "label": "Single-event electronic upset / latchup",
+      "description": "A high-energy particle traversed the command-receiver or command-processor integrated circuit, causing a single-event upset (SEU) that flipped a critical configuration bit, or inducing a latchup that rendered the uplink receiver unresponsive.",
+      "assessment": "mixed",
+      "heuristic_note": "use_global",
+      "evidence_rules": {
+        "environmental_context":       ["env_ep8_window", "env_mag_window"],
+        "supporting_evidence":         [],
+        "contradicting_evidence":      [],
+        "non_discriminating_evidence": ["anchor_non_discriminating"]
+      },
+      "limitations": [
+        {
+          "type": "unresolved",
+          "description": "Continued payload/transponder operation constrains hypotheses involving spacecraft-wide failure, but does not rule out a localized electronic upset in the command subsystem."
+        },
+        {
+          "type": "proxy_measurement",
+          "description": "The 5-minute averaging of EP8 particle flux data smooths sub-minute impulsive flux increases that may have caused single-event upsets. The exact particle environment at the time of upset cannot be resolved from 5-minute averages."
+        },
+        {
+          "type": "proxy_measurement",
+          "description": "B_GSM is the local field at GOES-11, not at the Galaxy 15 spacecraft body. No magnetometer was onboard Galaxy 15."
+        }
+      ]
+    },
+    {
+      "hypothesis_id": "H3",
+      "label": "Command receiver / command-processing fault",
+      "description": "A fault internal to the command receiver or command-processing chain — hardware, firmware, power-state, or software — produced a persistent loss of command uplink capability independent of the external environment.",
+      "assessment": "supported",
+      "heuristic_note": null,
+      "evidence_rules": {
+        "environmental_context":       [],
+        "supporting_evidence":         ["anchor_supporting_persistent_fault"],
+        "contradicting_evidence":      [],
+        "non_discriminating_evidence": []
+      },
+      "limitations": [
+        {
+          "type": "unresolved",
+          "description": "Autonomous recovery provides evidence against an irreversible catastrophic failure, but does not by itself distinguish among recoverable hardware, software, power-state, latchup, or command-processing mechanisms."
+        },
+        {
+          "type": "missing_data",
+          "description": "No spacecraft command-subsystem telemetry, onboard fault logs, or RF link data are present in this dataset."
+        }
+      ]
+    },
+    {
+      "hypothesis_id": "H4",
+      "label": "Ground segment / RF link anomaly",
+      "description": "A fault in the ground station, the RF uplink chain, or the command-routing infrastructure produced the apparent loss of command responsiveness without any fault on the spacecraft.",
+      "assessment": "insufficient_evidence",
+      "heuristic_note": null,
+      "evidence_rules": {
+        "environmental_context":       [],
+        "supporting_evidence":         [],
+        "contradicting_evidence":      [],
+        "non_discriminating_evidence": []
+      },
+      "limitations": [
+        {
+          "type": "missing_data",
+          "description": "No ground-segment or RF link data is present in this dataset. This hypothesis cannot be evaluated from the available evidence."
+        }
+      ]
+    },
+    {
+      "hypothesis_id": "H5",
+      "label": "Insufficient evidence for causal attribution",
+      "description": "The available evidence is insufficient to establish a causal mechanism for the Galaxy 15 command anomaly. This is a legitimate outcome of the investigation, not a failure to analyse.",
+      "assessment": "strongly_supported",
+      "heuristic_note": null,
+      "evidence_rules": {
+        "environmental_context":       [],
+        "supporting_evidence":         ["anchor_supporting_unresolved"],
+        "contradicting_evidence":      [],
+        "non_discriminating_evidence": []
+      },
+      "limitations": [
+        {
+          "type": "unresolved",
+          "description": "Causal attribution is not established by the available evidence, as stated in case.json. Multiple hypotheses remain plausible and cannot be discriminated without additional data."
+        },
+        {
+          "type": "missing_data",
+          "description": "Key discriminating data — spacecraft command-subsystem telemetry, onboard fault logs, RF link monitoring, and direct in-situ particle measurements at the Galaxy 15 bus — are absent from this dataset."
+        }
+      ]
+    }
+  ]
+}
