@@ -1,0 +1,112 @@
+{
+  "case_id": "galaxy-15",
+  "analysis_version": "4.3.0",
+  "causal_attribution_established": false,
+  "evidence_record_count": 278,
+  "first_evidence_id": "E-G15-0001",
+  "last_evidence_id": "E-G15-0278",
+  "ephemeris_count": 61,
+  "evidence_summary": {
+    "total_environmental_context": 28,
+    "total_supporting_evidence": 2,
+    "total_contradicting_evidence": 0,
+    "total_non_discriminating_evidence": 2,
+    "total_limitations": 11
+  },
+  "comparison": {
+    "assessed_hypotheses": ["H1","H2","H3","H4","H5"],
+    "supported_hypotheses": ["H3","H5"],
+    "mixed_hypotheses": ["H1","H2"],
+    "insufficient_hypotheses": ["H4"],
+    "most_supported": "H5"
+  },
+  "hypotheses": [
+    {
+      "hypothesis_id": "H1",
+      "label": "Spacecraft charging / electrostatic discharge",
+      "assessment": "mixed",
+      "evidence_summary": {
+        "environmental_context_count": 4,
+        "supporting_evidence_count": 0,
+        "contradicting_evidence_count": 0,
+        "non_discriminating_evidence_count": 1,
+        "environmental_context_ids": ["E-G15-0158","E-G15-0165","E-G15-0174","E-G15-0182"],
+        "supporting_evidence_ids": [],
+        "contradicting_evidence_ids": [],
+        "non_discriminating_evidence_ids": ["E-G15-0167"]
+      },
+      "limitation_count": 3
+    },
+    {
+      "hypothesis_id": "H2",
+      "label": "Single-event electronic upset / latchup",
+      "assessment": "mixed",
+      "evidence_summary": {
+        "environmental_context_count": 24,
+        "supporting_evidence_count": 0,
+        "contradicting_evidence_count": 0,
+        "non_discriminating_evidence_count": 1,
+        "environmental_context_ids": [
+          "E-G15-0158","E-G15-0165","E-G15-0174","E-G15-0182",
+          "E-G15-0152","E-G15-0154","E-G15-0155","E-G15-0156",
+          "E-G15-0159","E-G15-0160","E-G15-0161","E-G15-0163",
+          "E-G15-0164","E-G15-0166","E-G15-0169","E-G15-0170",
+          "E-G15-0171","E-G15-0173","E-G15-0175","E-G15-0176",
+          "E-G15-0178","E-G15-0179","E-G15-0180","E-G15-0183"
+        ],
+        "supporting_evidence_ids": [],
+        "contradicting_evidence_ids": [],
+        "non_discriminating_evidence_ids": ["E-G15-0167"]
+      },
+      "limitation_count": 3
+    },
+    {
+      "hypothesis_id": "H3",
+      "label": "Command receiver / command-processing fault",
+      "assessment": "supported",
+      "evidence_summary": {
+        "environmental_context_count": 0,
+        "supporting_evidence_count": 1,
+        "contradicting_evidence_count": 0,
+        "non_discriminating_evidence_count": 0,
+        "environmental_context_ids": [],
+        "supporting_evidence_ids": ["E-G15-0167"],
+        "contradicting_evidence_ids": [],
+        "non_discriminating_evidence_ids": []
+      },
+      "limitation_count": 2
+    },
+    {
+      "hypothesis_id": "H4",
+      "label": "Ground segment / RF link anomaly",
+      "assessment": "insufficient_evidence",
+      "evidence_summary": {
+        "environmental_context_count": 0,
+        "supporting_evidence_count": 0,
+        "contradicting_evidence_count": 0,
+        "non_discriminating_evidence_count": 0,
+        "environmental_context_ids": [],
+        "supporting_evidence_ids": [],
+        "contradicting_evidence_ids": [],
+        "non_discriminating_evidence_ids": []
+      },
+      "limitation_count": 1
+    },
+    {
+      "hypothesis_id": "H5",
+      "label": "Insufficient evidence for causal attribution",
+      "assessment": "strongly_supported",
+      "evidence_summary": {
+        "environmental_context_count": 0,
+        "supporting_evidence_count": 1,
+        "contradicting_evidence_count": 0,
+        "non_discriminating_evidence_count": 0,
+        "environmental_context_ids": [],
+        "supporting_evidence_ids": ["E-G15-0167"],
+        "contradicting_evidence_ids": [],
+        "non_discriminating_evidence_ids": []
+      },
+      "limitation_count": 2
+    }
+  ]
+}
