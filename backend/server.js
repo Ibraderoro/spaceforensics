@@ -10,6 +10,7 @@ const aiAnalyst                  = require('./services/aiAnalyst');
 const investigationStore         = require('./services/investigationStore');
 const artifactService            = require('./services/artifactService');
 const evidenceExploration        = require('./services/evidenceExploration');
+const evidenceCaseCache          = require('./services/evidenceCaseCache');
 const { pipelineLog, startTimer, PIPELINE_STAGES } = require('./services/pipelineLogger');
 const { FORENSIC_TEMPORAL_WINDOW_MINUTES }         = require('./services/forensicConfig');
 
@@ -500,6 +501,225 @@ app.get('/api/cases/:id/evidence-graph', async (req, res) => {
   res.json(await buildEvidenceGraph(req.params.id, rows));
 });
 
+// ===========================================================================
+// EVIDENCE EXPLORATION HTTP API — Phase 10.2A
+//
+// Read-only HTTP surface over the Phase 10.1 evidenceExplorationService.
+// All routes delegate evidence logic to the service; none duplicate it.
+//
+// ORDERING NOTE: static-segment routes (/evidence, /evidence/source/:source,
+// /evidence/measurement, /evidence/time-window, /evidence/anomaly-centered)
+// are registered before /evidence/:evidenceId so Express does not capture
+// static path segments as parameter values.
+//
+// INVARIANTS (carry forward from Phase 7.3 EX-1 to EX-10, Phase 10.1 SI-1 to SI-14):
+//   All routes are GET (read-only).
+//   No route writes, creates, or mutates any authoritative state.
+//   causal_attribution_established is passed through verbatim; never set here.
+//   Assessments are never re-derived; passed through from graph verbatim.
+//   Malformed / missing required parameters return 400 VALIDATION_ERROR.
+//   Unknown cases return 404 CASE_NOT_FOUND.
+// ===========================================================================
+
+// ---------------------------------------------------------------------------
+// Helper: load rows + graph for a case via the evidence cache (Phase 10.3.2).
+// Sends the appropriate HTTP error and returns null on any failure.
+//
+// All Phase 10.2A exploration routes and the Phase 7.3 exploration routes
+// that need rows + graph now go through this helper, which delegates to
+// evidenceCaseCache.getCaseEvidence.  On a warm hit no CSV parsing or graph
+// building occurs.  On a cold miss the cache loads, stores, and returns.
+// The forensic pipeline, AI, and investigation routes are NOT affected —
+// they have independent loading paths that must remain deterministic.
+// ---------------------------------------------------------------------------
+async function _loadRowsAndGraph(res, caseId) {
+  try {
+    return await evidenceCaseCache.getCaseEvidence(caseId);
+  } catch (err) {
+    if (err && err.status === 404) {
+      apiError(res, 'CASE_NOT_FOUND', `Case not found: ${caseId}`, 404);
+    } else {
+      handleForensicError(res, err);
+    }
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Helper: dispatch a service result to an HTTP response.
+// Maps error_code strings to appropriate HTTP status codes.
+// ---------------------------------------------------------------------------
+function _dispatchServiceResult(res, result) {
+  if (!result || result.error_code) {
+    const code = result && result.error_code;
+    const NOT_FOUND_CODES = new Set([
+      'CASE_NOT_FOUND', 'CASE_MISMATCH', 'HYPOTHESIS_NOT_FOUND', 'EVIDENCE_NOT_FOUND',
+    ]);
+    const BAD_INPUT_CODES = new Set([
+      'INVALID_FILTER', 'INVALID_EVIDENCE_ID', 'INVALID_HYPOTHESIS_ID', 'INVALID_CASE_ID',
+    ]);
+    const httpStatus = NOT_FOUND_CODES.has(code) ? 404
+      : BAD_INPUT_CODES.has(code) ? 400
+      : 422;
+    return apiError(res, code || 'INTERNAL_ERROR',
+      (result && result.error) || 'Unexpected error.', httpStatus);
+  }
+  return res.json(result);
+}
+
+const explorationService = require('./services/evidenceExplorationService');
+
+// ---------------------------------------------------------------------------
+// GET /api/cases/:id/evidence
+//
+// Returns all evidence rows for the case (SI-2, SI-11).
+// Includes causal_attribution_established verbatim (read-only passthrough).
+// ---------------------------------------------------------------------------
+app.get('/api/cases/:id/evidence', async (req, res) => {
+  const caseId = req.params.id;
+  if (!await guardCaseExists(res, caseId)) return;
+  const loaded = await _loadRowsAndGraph(res, caseId);
+  if (!loaded) return;
+  const result = explorationService.getEvidenceByCaseId(caseId, loaded.rows, loaded.graph);
+  return _dispatchServiceResult(res, result);
+});
+
+// ---------------------------------------------------------------------------
+// GET /api/cases/:id/evidence/source/:source
+//
+// Returns evidence rows filtered by exact source string (SI-14).
+// Static "source" segment registered before /:evidenceId.
+// ---------------------------------------------------------------------------
+app.get('/api/cases/:id/evidence/source/:source', async (req, res) => {
+  const caseId = req.params.id;
+  if (!await guardCaseExists(res, caseId)) return;
+  const loaded = await _loadRowsAndGraph(res, caseId);
+  if (!loaded) return;
+  const result = explorationService.filterBySource(
+    caseId, req.params.source, loaded.rows, loaded.graph,
+  );
+  return _dispatchServiceResult(res, result);
+});
+
+// ---------------------------------------------------------------------------
+// GET /api/cases/:id/evidence/measurement
+//
+// Returns evidence rows filtered by measurement string or evidence_type.
+// Query parameters (at least one required):
+//   measurement    — exact row.measurement string
+//   evidence_type  — exact row.evidence_type string
+// ---------------------------------------------------------------------------
+app.get('/api/cases/:id/evidence/measurement', async (req, res) => {
+  const caseId = req.params.id;
+  if (!await guardCaseExists(res, caseId)) return;
+  const { measurement, evidence_type } = req.query;
+  if (!measurement && !evidence_type) {
+    return apiError(res, 'VALIDATION_ERROR',
+      'At least one of measurement or evidence_type query parameter is required.', 400);
+  }
+  const loaded = await _loadRowsAndGraph(res, caseId);
+  if (!loaded) return;
+  const result = explorationService.filterByMeasurementType(
+    caseId, { measurement, evidence_type }, loaded.rows, loaded.graph,
+  );
+  return _dispatchServiceResult(res, result);
+});
+
+// ---------------------------------------------------------------------------
+// GET /api/cases/:id/evidence/time-window
+//
+// Returns evidence rows within the given ISO 8601 time range (inclusive).
+// Query parameters (at least one required):
+//   from  — ISO 8601 lower bound
+//   to    — ISO 8601 upper bound
+//
+// Always carries temporal_note disclaiming no causal inference (SI-7).
+// ---------------------------------------------------------------------------
+app.get('/api/cases/:id/evidence/time-window', async (req, res) => {
+  const caseId = req.params.id;
+  if (!await guardCaseExists(res, caseId)) return;
+  const { from, to } = req.query;
+  if (!from && !to) {
+    return apiError(res, 'VALIDATION_ERROR',
+      'At least one of from or to query parameter is required.', 400);
+  }
+  const loaded = await _loadRowsAndGraph(res, caseId);
+  if (!loaded) return;
+  const result = explorationService.filterByTimeWindow(
+    caseId, { from, to }, loaded.rows, loaded.graph,
+  );
+  return _dispatchServiceResult(res, result);
+});
+
+// ---------------------------------------------------------------------------
+// GET /api/cases/:id/evidence/anomaly-centered
+//
+// Returns evidence records within +-window_minutes of the given timestamp.
+// Query parameters (both required):
+//   timestamp       — ISO 8601 focal point
+//   window_minutes  — positive number
+//
+// Always carries heuristic_window_note disclaiming no causal inference (SI-7).
+// ---------------------------------------------------------------------------
+app.get('/api/cases/:id/evidence/anomaly-centered', async (req, res) => {
+  const caseId = req.params.id;
+  if (!await guardCaseExists(res, caseId)) return;
+  const { timestamp, window_minutes } = req.query;
+  if (!timestamp) {
+    return apiError(res, 'VALIDATION_ERROR',
+      'timestamp query parameter is required (ISO 8601 string).', 400);
+  }
+  if (!window_minutes) {
+    return apiError(res, 'VALIDATION_ERROR',
+      'window_minutes query parameter is required (positive number).', 400);
+  }
+  const windowMins = Number(window_minutes);
+  if (!Number.isFinite(windowMins) || windowMins <= 0) {
+    return apiError(res, 'VALIDATION_ERROR',
+      'window_minutes must be a positive finite number.', 400);
+  }
+  const loaded = await _loadRowsAndGraph(res, caseId);
+  if (!loaded) return;
+  const result = explorationService.getAnomalyCenteredEvidence(
+    caseId, timestamp, windowMins, loaded.rows, loaded.graph,
+  );
+  return _dispatchServiceResult(res, result);
+});
+
+// ---------------------------------------------------------------------------
+// GET /api/cases/:id/evidence/:evidenceId
+//
+// Returns a single evidence record by ID (all 12 fields) plus
+// hypothesis_relationships.  EPHEMERIS records resolve with found: true and
+// empty hypothesis_relationships.  Unknown IDs return 404.
+//
+// Registered AFTER all static-segment /evidence/* routes so that
+// "source", "measurement", "time-window", "anomaly-centered" are not
+// inadvertently captured as :evidenceId.
+// ---------------------------------------------------------------------------
+app.get('/api/cases/:id/evidence/:evidenceId', async (req, res) => {
+  const caseId = req.params.id;
+  if (!await guardCaseExists(res, caseId)) return;
+  const loaded = await _loadRowsAndGraph(res, caseId);
+  if (!loaded) return;
+  const result = explorationService.getEvidenceById(
+    caseId, req.params.evidenceId, loaded.rows, loaded.graph,
+  );
+  if (result && result.error_code) {
+    const httpStatus = result.error_code === 'INVALID_EVIDENCE_ID' ? 400 : 422;
+    return apiError(res, result.error_code, result.error, httpStatus);
+  }
+  if (result && result.found === false) {
+    return res.status(404).json({
+      ...result,
+      error_code:  'EVIDENCE_NOT_FOUND',
+      error:       result.reason || 'Evidence ID not found in timeline.',
+      status_code: 404,
+    });
+  }
+  return res.json(result);
+});
+
 // ---------------------------------------------------------------------------
 // GET /api/cases/:id/evidence/:evidenceId/provenance
 // Returns the full provenance record for a single evidence ID:
@@ -512,17 +732,10 @@ app.get('/api/cases/:id/evidence/:evidenceId/provenance', async (req, res) => {
   const caseId = req.params.id;
   if (!await guardCaseExists(res, caseId)) return;
 
-  let rows;
-  try {
-    rows = await parseEvidenceCSV(caseId);
-  } catch (err) {
-    if (err && err.status === 404) {
-      return apiError(res, 'CASE_NOT_FOUND', `Case not found: ${caseId}`, 404);
-    }
-    return handleForensicError(res, err);
-  }
+  const cached = await _loadRowsAndGraph(res, caseId);
+  if (!cached) return;
+  const { rows, graph } = cached;
 
-  const graph = await buildEvidenceGraph(caseId, rows);
   const result = getEvidenceProvenance(caseId, req.params.evidenceId, rows, graph);
 
   if (!result.found) {
@@ -781,17 +994,10 @@ app.get('/api/cases/:id/hypotheses/:hid/evidence', async (req, res) => {
   const caseId = req.params.id;
   if (!await guardCaseExists(res, caseId)) return;
 
-  let rows;
-  try {
-    rows = await parseEvidenceCSV(caseId);
-  } catch (err) {
-    if (err && err.status === 404) {
-      return apiError(res, 'CASE_NOT_FOUND', `Case not found: ${caseId}`, 404);
-    }
-    return handleForensicError(res, err);
-  }
+  const cached = await _loadRowsAndGraph(res, caseId);
+  if (!cached) return;
+  const { rows, graph } = cached;
 
-  const graph = await buildEvidenceGraph(caseId, rows);
   const hypothesis = graph.hypotheses.find((h) => h.hypothesis_id === req.params.hid);
   if (!hypothesis) {
     return apiError(res, 'HYPOTHESIS_NOT_FOUND',
@@ -814,17 +1020,10 @@ app.get('/api/cases/:id/evidence-index', async (req, res) => {
   const caseId = req.params.id;
   if (!await guardCaseExists(res, caseId)) return;
 
-  let rows;
-  try {
-    rows = await parseEvidenceCSV(caseId);
-  } catch (err) {
-    if (err && err.status === 404) {
-      return apiError(res, 'CASE_NOT_FOUND', `Case not found: ${caseId}`, 404);
-    }
-    return handleForensicError(res, err);
-  }
+  const cached = await _loadRowsAndGraph(res, caseId);
+  if (!cached) return;
+  const { rows, graph } = cached;
 
-  const graph = await buildEvidenceGraph(caseId, rows);
   const index = evidenceExploration.buildCaseEvidenceIndex(graph, rows);
   return res.json({ case_id: caseId, evidence_count: index.length, evidence: index });
 });
@@ -840,17 +1039,10 @@ app.get('/api/cases/:id/environmental-context', async (req, res) => {
   const caseId = req.params.id;
   if (!await guardCaseExists(res, caseId)) return;
 
-  let rows;
-  try {
-    rows = await parseEvidenceCSV(caseId);
-  } catch (err) {
-    if (err && err.status === 404) {
-      return apiError(res, 'CASE_NOT_FOUND', `Case not found: ${caseId}`, 404);
-    }
-    return handleForensicError(res, err);
-  }
+  const cached = await _loadRowsAndGraph(res, caseId);
+  if (!cached) return;
+  const { rows, graph } = cached;
 
-  const graph   = await buildEvidenceGraph(caseId, rows);
   const summary = evidenceExploration.buildEnvironmentalContextSummary(graph, rows);
   return res.json({ case_id: caseId, ...summary });
 });
@@ -872,17 +1064,9 @@ app.get('/api/cases/:id/hypotheses/compare', async (req, res) => {
   const caseId = req.params.id;
   if (!await guardCaseExists(res, caseId)) return;
 
-  let rows;
-  try {
-    rows = await parseEvidenceCSV(caseId);
-  } catch (err) {
-    if (err && err.status === 404) {
-      return apiError(res, 'CASE_NOT_FOUND', `Case not found: ${caseId}`, 404);
-    }
-    return handleForensicError(res, err);
-  }
-
-  const graph = await buildEvidenceGraph(caseId, rows);
+  const cached = await _loadRowsAndGraph(res, caseId);
+  if (!cached) return;
+  const { rows, graph } = cached;
 
   // Parse optional hypothesis_ids query param.
   let hypothesisIds = [];
