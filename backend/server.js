@@ -2286,6 +2286,77 @@ app.get('/api/cases/:id/investigations/:iid/history', async (req, res) => {
   return res.json(responseHistory);
 });
 
+// ===========================================================================
+// Phase 10.3.4 — Cache observability and management endpoints
+//
+// These routes expose the evidence case cache (evidenceCaseCache.js) via HTTP
+// for operational use.  They are intentionally under /api/cache/evidence/ so
+// they cannot be captured by any existing /api/cases/:id/* dynamic routes.
+//
+// Route safety: Express evaluates routes in registration order.  Because
+// /api/cache/evidence/* uses a completely different first path segment
+// ("cache" vs "cases") there is zero ambiguity with existing dynamic routes.
+//
+// CONSTRAINTS (Phase 10.3.4):
+//   - No evidence loading, CSV parsing, or graph construction.
+//   - No mutation of source files, case.json, or hypotheses.json.
+//   - No modification of forensic, hypothesis, or AI behaviour.
+//   - No TTL, ETag, Redis, or external caching.
+//   - Stats endpoint never returns raw rows or graph data.
+// ===========================================================================
+
+// ---------------------------------------------------------------------------
+// GET /api/cache/evidence/stats
+//
+// Returns current evidence cache statistics — size, counters, inFlight count,
+// and the list of currently cached case IDs.
+// Does NOT load evidence and does NOT expose rows or graph data.
+// ---------------------------------------------------------------------------
+app.get('/api/cache/evidence/stats', (req, res) => {
+  const s = evidenceCaseCache.getStats();
+  return res.json({
+    size:          s.size,
+    hits:          s.hits,
+    misses:        s.misses,
+    invalidations: s.invalidations,
+    inFlight:      s.inFlight,
+  });
+});
+
+// ---------------------------------------------------------------------------
+// POST /api/cache/evidence/invalidate/:caseId
+//
+// Removes the cached entry for the given caseId, if one exists.
+// Does NOT load evidence, modify source files, or alter forensic output.
+// Returns { invalidated: true, case_id } when an entry was present and
+// removed; { invalidated: false, case_id } when no entry existed.
+// ---------------------------------------------------------------------------
+app.post('/api/cache/evidence/invalidate/:caseId', (req, res) => {
+  const caseId = req.params.caseId;
+  const wasCached = evidenceCaseCache.has(caseId);
+  evidenceCaseCache.invalidateCase(caseId);
+  return res.json({
+    invalidated: wasCached,
+    case_id:     caseId,
+  });
+});
+
+// ---------------------------------------------------------------------------
+// POST /api/cache/evidence/invalidate-all
+//
+// Clears every entry in the evidence case cache.
+// Does NOT delete files, modify PostgreSQL, modify investigation records,
+// or affect any other application service.
+// ---------------------------------------------------------------------------
+app.post('/api/cache/evidence/invalidate-all', (req, res) => {
+  const sizeBefore = evidenceCaseCache.getStats().size;
+  evidenceCaseCache.invalidateAll();
+  return res.json({
+    invalidated: true,
+    cleared:     sizeBefore,
+  });
+});
+
 // ---------------------------------------------------------------------------
 // Catch-all: unknown routes / unsupported methods
 // Must be registered after all application routes.
