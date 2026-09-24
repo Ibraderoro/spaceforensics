@@ -1,342 +1,341 @@
-# 🛰️ SPACEFORENSICS
+# SpaceForensics
 
-> **AI-Powered Forensic Investigation Engine for Unexpected Space Events**
+Evidence-grounded forensic analysis for unexpected spacecraft events.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Built with IBM Bob](https://img.shields.io/badge/Built%20With-IBM%20Bob-blueviolet.svg)](#-how-ibm-bob-was-used)
-[![AI: IBM Granite via LangChain](https://img.shields.io/badge/AI-IBM%20Granite%20%7C%20LangChain-blue.svg)](#-ai-approach--architecture)
-[![Challenge: IBM Build with AI](https://img.shields.io/badge/Challenge-IBM%20Build%20with%20AI-orange.svg)](#-selected-challenge-theme)
+SpaceForensics ingests multi-source observational data, constructs a structured evidence graph, runs deterministic forensic assessment across competing hypotheses, and then — and only then — supplies that validated analysis to an AI analyst for narrative explanation. The AI explains the forensic findings. It does not produce them.
 
 ---
 
-## 🎯 Selected Challenge Theme
+## Why SpaceForensics?
 
-**Track:** IBM Build with AI Hackathon Challenge
+Satellite anomaly investigations combine observations from multiple sensor streams (different instruments, resolutions, and time bases), spacecraft metadata, environmental context, and competing physical hypotheses. The data is noisy, incomplete, and temporally non-uniform.
 
-**Objective:** Transform space anomaly investigation from slow, expert-only forensic workflows into an AI-assisted, evidence-backed, auditable reasoning system — making spacecraft anomaly analysis accessible, transparent, and scientifically defensible.
+A conventional LLM handed raw space weather data will produce fluent, confident-sounding causal explanations with no reliable relationship to the evidence. It correlates co-occurring events and presents association as mechanism. It cannot self-falsify. It cannot flag missing data. It cannot hold a hypothesis as `insufficient_evidence` when evidence is genuinely absent.
 
----
+SpaceForensics is designed around that specific problem. It separates:
 
-## ❓ Problem Statement
-
-Space operators investigating satellite anomalies face a unique and dangerous failure mode when applying standard AI tooling: **the Black-Box LLM Problem**.
-
-Generic AI wrappers that ingest raw space weather data and produce narrative outputs like *"A solar flare caused the satellite reset"* are **rejected by domain experts** for three well-founded reasons:
-
-| Failure Mode | Impact |
-|---|---|
-| **Hallucinated causal links** | LLMs correlate co-occurring events (e.g., a geomagnetic storm + a command anomaly) and invent causation, producing claims unsupported by the underlying physics |
-| **Lossy temporal flattening** | Multi-rate sensor streams (1-min magnetometer, 5-min particle flux, 3-min orbital ephemeris) are downsampled or averaged, destroying the temporal nuance needed to establish event sequencing |
-| **No self-falsification** | Standard LLM outputs offer no mechanism to challenge their own conclusions, identify missing sensors, evaluate observational gaps, or recalibrate confidence when counter-evidence exists |
-
-The result: **AI-generated anomaly reports that cannot be trusted** and are discarded by the satellite engineers and space physicists who need them most.
-
-### Hero Case — Galaxy 15 ("Zombiesat")
-
-On **April 5, 2010 at 09:48 UTC**, the Galaxy 15 (AMC-15) geostationary communications satellite operated by Intelsat failed to respond to all ground commands following an intense geomagnetic storm. The spacecraft entered what became known as the **"Zombiesat" state** — transponders active, attitude control nominal, but the command uplink permanently unresponsive. Galaxy 15 drifted freely through the GEO belt for **nine months** before autonomously rebooting on December 26, 2010.
-
-The cause remains scientifically contested. Three competing hypotheses — surface charging / electrostatic discharge (ESD), a single event upset (SEU) in the command processor, and a spontaneous hardware failure — each have supporting evidence and critical weaknesses. This is the exact class of problem that rewards structured forensic AI reasoning rather than point-estimate prediction.
+- **Observed evidence** — what the instruments actually recorded
+- **Environmental context** — conditions present near the anomaly time
+- **Deterministic forensic assessment** — categorical hypothesis evaluations with explicit evidence citations
+- **AI-generated explanation** — constrained narrative downstream of validated analysis
+- **Provenance** — which dataset, provider, and variable each record came from
+- **Uncertainty** — explicit limitations on every hypothesis
+- **Case boundaries** — strict isolation between different spacecraft investigations
 
 ---
 
-## 💡 Solution Description
+## The core architectural idea
 
-**SPACEFORENSICS** is an evidence-backed forensic reasoning engine that investigates satellite anomalies under real-world observational uncertainty.
+**The AI is constrained by the forensic system, not the other way around.**
 
-Instead of outputting unverified predictions, SPACEFORENSICS operates as an active **scientific forensic investigator**:
+The forensic analysis pipeline runs first, deterministically, from the evidence files. The pipeline produces categorical hypothesis assessments (`supported`, `mixed`, `insufficient_evidence`, `strongly_supported`) and a `causal_attribution_established` boolean. Those outputs are validated before the LLM ever sees them. The LLM receives the validated analysis as structured input and is permitted only to explain it — not to change it, contradict it, introduce unsupported evidence IDs, or claim numerical probability values.
 
-### Core Capabilities
-
-**1 — Multi-Rate Evidence Preservation**
-Ingests native, multi-resolution temporal streams directly from NASA CDAWeb without lossy downsampling:
-- GOES-11 EP8 particle flux at 5-minute resolution (36 records)
-- GOES-11 magnetometer B-field in GSM coordinates at 1-minute resolution (180 records)
-- GOES-11 orbital ephemeris at 3-minute resolution (61 records)
-- Anchor event record at the exact anomaly timestamp
-
-All 278 normalised evidence records are preserved in their original temporal structure as a flat CSV, timestamped in ISO 8601, and served via a REST API.
-
-**2 — Dual-Pass AI Reasoning Engine**
-A two-stage reasoning architecture evaluates three physics-based hypotheses with explicit supporting evidence citations:
-
-- **Pass 1 (Hypothesis Generation):** Constructs three competing hypotheses (Surface Charging/ESD, Single Event Upset, Hardware Failure), scores each with a confidence value (0–100), and maps supporting evidence records to each.
-- **Pass 2 (Red-Team Challenge):** Acts as an adversarial Red-Team agent. Challenges the leading hypothesis by scanning for missing signatures, evaluating sensor limitations, and identifying contradicting data. Confidence scores are recalibrated when counter-evidence is found.
-
-**3 — Interactive Forensic Dashboard**
-A dark-mode React command-center renders the full investigation state:
-- Multi-series Recharts timeline chart (MAG + EP8 overlaid, anomaly reference line)
-- Animated hypothesis confidence matrix with colour-coded progress bars
-- Red-team challenge panel with counter-evidence list and confidence recalibration
-- Exportable Forensic Summary Report with case metadata, data sources, and scientific limitations
-
-**4 — Scientific Transparency**
-Every output cites the evidence records that inform it. Scientific limitations (proxy sensor distance, data gaps, averaging artefacts) are surfaced explicitly and included in every report — not hidden.
-
----
-
-## 🧠 AI Approach & Architecture
-
-SPACEFORENSICS uses **IBM Granite 3.3 8B Instruct** (`ibm/granite-3-3-8b-instruct`) via **IBM Watsonx.ai**, orchestrated through **LangChain** (`@langchain/ibm`) in a dual-pass agent architecture.
-
-### Architecture Diagram
+If LLM output fails validation, the system falls back to a deterministic heuristic narrative. The evidence-grounded result always reaches the consumer.
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        DATA PIPELINE                            │
-│  NASA CDAWeb API  →  fetch_galaxy15.py  →  galaxy15_evidence.csv│
-│  (3 datasets)         (Python/pandas)      (278 records, flat)  │
-└───────────────────────────────┬─────────────────────────────────┘
-                                │
-┌───────────────────────────────▼─────────────────────────────────┐
-│                       EXPRESS REST API                          │
-│  GET  /api/cases/:id            → case metadata (case.json)     │
-│  GET  /api/cases/:id/timeline   → 278 evidence records          │
-│  GET  /api/cases/:id/evidence-graph → static hypothesis nodes   │
-│  POST /api/cases/:id/investigate    → Pass 1 hypothesis scores  │
-│  POST /api/cases/:id/challenge      → Pass 1 + Pass 2 combined  │
-└───────────────────────────────┬─────────────────────────────────┘
-                                │
-┌───────────────────────────────▼─────────────────────────────────┐
-│                      AI ENGINE (aiEngine.js)                    │
-│                                                                 │
-│  classifyEvidence(rows)                                         │
-│    → peakEp8, elevatedFluxCount, magNearAnomaly                 │
-│                                                                 │
-│  Pass 1: generateHypothesesPass(evidenceStream)                 │
-│    → IBM Granite via ChatWatsonx (LangChain)                    │
-│    → System prompt: space weather analyst, return JSON schema   │
-│    → Returns: hypotheses[{id, label, confidence, reasoning,     │
-│               supporting_evidence}], top_hypothesis_id          │
-│                                                                 │
-│  Pass 2: redTeamChallengePass(leadingHypothesis, evidenceStream)│
-│    → IBM Granite via ChatWatsonx (LangChain)                    │
-│    → System prompt: Red-Team agent, challenge named hypothesis  │
-│    → Returns: counter_evidence[{type, description,              │
-│               confidence_impact}], updated_hypotheses,          │
-│               red_team_summary                                  │
-│                                                                 │
-│  Fallback (no API key): deterministic domain-logic engine       │
-│    → ESD baseline 60 + flux bonuses                             │
-│    → SEU baseline 50 + mag disturbance bonus                    │
-│    → Hardware Failure baseline 30 − environment penalty         │
-└───────────────────────────────┬─────────────────────────────────┘
-                                │
-┌───────────────────────────────▼─────────────────────────────────┐
-│                    REACT DASHBOARD (Vite)                       │
-│  Header → EventTimeline (Recharts) → HypothesisMatrix           │
-│  RedTeamPanel → ReportModal                                     │
-│  Tailwind CSS dark-mode · Lucide Icons · port 5173              │
-└─────────────────────────────────────────────────────────────────┘
+Case Files
+    ↓
+Evidence Ingestion (deterministic IDs + provenance)
+    ↓
+Evidence Graph (hypothesis/evidence relationships)
+    ↓
+Deterministic Forensic Analysis
+    ↓
+AI Analyst (explains validated analysis)
+    ↓
+Validated Narrative
+    ↓
+REST API → React UI
 ```
-
-### LLM Integration Details
-
-| Property | Value |
-|---|---|
-| **Model** | `ibm/granite-3-3-8b-instruct` |
-| **Platform** | IBM Watsonx.ai (`https://us-south.ml.cloud.ibm.com`) |
-| **LangChain Class** | `ChatWatsonx` from `@langchain/ibm` |
-| **Auth** | `WATSONX_AI_APIKEY` + `WATSONX_AI_PROJECT_ID` (env vars) |
-| **Max Tokens** | 1024 per pass |
-| **Fallback** | Deterministic domain-logic engine (runs when no API key) |
-
-### Pass 1 — Hypothesis Generation Prompt Design
-
-The system prompt instructs Granite to act as a **space weather analyst** specialising in geostationary satellite anomaly forensics. The user message supplies a compact summary of computed evidence metrics (peak e-flux, elevated-flux count, magnetic disturbance rows). Granite returns structured JSON matching the hypothesis schema, with confidence scores and supporting evidence IDs for each competing hypothesis.
-
-### Pass 2 — Red-Team Challenge Prompt Design
-
-The system prompt instructs Granite to act as a **Red-Team agent** whose sole purpose is to challenge the named leading hypothesis. It is explicitly instructed to find missing signatures (e.g. absent proton flux sensor), contradicting data (e.g. attitude control remained nominal), and sensor limitations (e.g. proxy observer 2° away). Granite returns structured JSON with `counter_evidence` items (typed: `missing_signature`, `contradicting_data`, `sensor_limitation`), updated confidence scores, and a red-team summary paragraph.
-
-### Deterministic Fallback
-
-When `WATSONX_AI_APIKEY` is absent, a self-contained domain-logic engine runs instead so all API endpoints return valid, structurally correct JSON during local development and CI:
-
-- **ESD:** baseline 60 → +15 if ≥5 elevated-flux readings → +10 if peak e-flux > 2000
-- **SEU:** baseline 50 → +10 if magnetic disturbance rows found → +5 if ≥3 elevated-flux readings
-- **Hardware Failure:** baseline 30 → −10 if peak e-flux > 2000 (environmental cause more likely)
-
-Pass 2 fallback always generates ≥3 counter-evidence items sourced from the known scientific limitations in `case.json`.
 
 ---
 
-## 🗂️ Project Structure
+## Galaxy 15 reference investigation
+
+Galaxy 15 is a geostationary communications satellite operated by Intelsat. On **2010-04-05 at 09:48 UTC**, it became unresponsive to all ground commands during disturbed geomagnetic and energetic-particle conditions. It continued transmitting — transponders active, attitude control nominal — but did not respond to the uplink for nine months before autonomously recovering on 2010-12-26. The causal mechanism was never definitively established.
+
+This investigation is the frozen v1.0.0 release baseline.
+
+### Evidence summary
+
+| Source | Instrument | Variable | Resolution | Records |
+|---|---|---|---|---|
+| `GOES11_EP8` | GOES-11 Energetic Particle Sensor | Electron flux >2 MeV | 5 min | 36 |
+| `GOES11_MAG` | GOES-11 Magnetometer | B-field GSM (nT) | 1 min | 180 |
+| `GOES11_EPHEMERIS` | GOES-11 SSC Ephemeris | Orbital radius (Re) | 3 min | 61 |
+| `CASE` | Anchor event | Command loss timestamp | Event | 1 |
+| **Total** | | | | **278** |
+
+- Evidence IDs: `E-G15-0001` through `E-G15-0278`
+- Data window: `2010-04-05T08:00:00Z` → `2010-04-05T11:00:00Z`
+- `causal_attribution_established: false`
+
+### Hypothesis assessments
+
+| ID | Hypothesis | Assessment |
+|---|---|---|
+| H1 | Spacecraft charging / electrostatic discharge | `mixed` |
+| H2 | Single-event electronic upset / latchup | `mixed` |
+| H3 | Command receiver / command-processing fault | `supported` |
+| H4 | Ground segment / RF link anomaly | `insufficient_evidence` |
+| H5 | Insufficient evidence for causal attribution | `strongly_supported` |
+
+These assessments are categorical, not probabilistic. No numerical probability values are assigned or claimed. H5 being `strongly_supported` reflects that the available environmental evidence does not establish a mechanism — it is a forensically honest result, not an engineering failure.
+
+---
+
+## Architecture
+
+```mermaid
+flowchart TD
+    CF[Case Files\ncase.json · hypotheses.json\nnormalized CSV] --> EI[Evidence Ingestion\ndeterministic IDs · provenance]
+    EI --> EC[Evidence Cache\nsource-signature validation\nconcurrent deduplication]
+    EC --> EG[Evidence Graph\nhypothesis/evidence relationships]
+    EC --> EE[Evidence Exploration Service\nfilter · source · time-window\nanomaly-centered · index]
+    EG --> FA[Deterministic Forensic Analysis\ncategorical assessments\ncausal_attribution_established]
+    FA --> AI[AI Analyst\nIBM Granite via Watsonx.ai\nLangChain ChatWatsonx]
+    AI --> VN[Validated Narrative\nvalidation → accepted or fallback]
+    EE --> API[Express REST API]
+    VN --> API
+    FA --> API
+    API --> UI[React / Vite UI\nTailwind · Recharts]
+    API --> PG[(PostgreSQL\ninvestigation workflow\nobservations · challenges)]
+```
+
+---
+
+## Scientific integrity
+
+These safeguards are enforced in code, not just policy:
+
+- **No unsupported causal attribution** — `causal_attribution_established` is a boolean controlled entirely by the forensic analysis pipeline; it cannot be set by the AI layer.
+- **Environmental context ≠ mechanism confirmation** — GOES-11 measurements document what conditions existed near the anomaly time; they do not confirm a specific physical mechanism.
+- **AI cannot invent evidence IDs** — the AI validator checks that every evidence ID cited in the AI output actually exists in the case's parsed evidence set.
+- **AI cannot change deterministic assessments** — hypothesis assessments in AI output are validated against the forensic analysis results; a mismatch triggers fallback.
+- **No numerical probability claims** — the AI validator rejects any output containing percentage figures or explicit probability language.
+- **Missing evidence stays missing** — data gaps in the source datasets are not filled, averaged, or explained away.
+- **Cross-case isolation** — evidence IDs, graph entries, and cache entries are strictly scoped per `caseId`; no data bleeds between investigations.
+
+---
+
+## AI architecture
+
+AI capability depends on environment configuration. The system is designed to degrade gracefully.
+
+- **LLM**: IBM Granite 3.3 8B Instruct (`ibm/granite-3-3-8b-instruct`)
+- **Platform**: IBM Watsonx.ai (`us-south.ml.cloud.ibm.com` by default)
+- **Client**: LangChain `ChatWatsonx` from `@langchain/ibm`
+- **Credentials**: `WATSONX_AI_APIKEY`, `WATSONX_AI_PROJECT_ID`, `WATSONX_AI_URL` (all optional — no key means no LLM calls)
+
+**Flow:**
+
+1. Deterministic forensic analysis runs from evidence files — no AI involved.
+2. Validated analysis is passed as structured input to the AI analyst.
+3. The AI is asked to produce a structured JSON narrative explaining the validated findings.
+4. The response is validated against the forensic results (evidence IDs, assessment values, causal attribution, no probabilities, no causal certainty language).
+5. A valid response is used; an invalid response triggers heuristic fallback — the deterministic result still reaches the consumer.
+
+The AI cannot access the evidence files directly. It receives only what the forensic pipeline has already assessed.
+
+---
+
+## Evidence exploration API
+
+All endpoints are read-only. Evidence data is served from the in-memory evidence cache.
+
+**Case and evidence retrieval**
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/api/cases` | List all available cases |
+| `GET` | `/api/cases/:id` | Case metadata |
+| `GET` | `/api/cases/:id/timeline` | All evidence rows, time-sorted |
+| `GET` | `/api/cases/:id/evidence-graph` | Hypothesis/evidence graph |
+| `GET` | `/api/cases/:id/evidence` | All evidence records |
+| `GET` | `/api/cases/:id/evidence/:evidenceId` | Single record with hypothesis relationships |
+| `GET` | `/api/cases/:id/evidence/:evidenceId/provenance` | Dataset, provider, and variable provenance |
+
+**Evidence exploration (filtering)**
+
+| Method | Path | Key params |
+|---|---|---|
+| `GET` | `/api/cases/:id/evidence/source/:source` | Filter by source string |
+| `GET` | `/api/cases/:id/evidence/measurement` | `measurement` or `evidence_type` |
+| `GET` | `/api/cases/:id/evidence/time-window` | `from`, `to` (ISO 8601) |
+| `GET` | `/api/cases/:id/evidence/anomaly-centered` | `timestamp`, `window_minutes` |
+| `GET` | `/api/cases/:id/evidence-index` | Evidence counts by source and type |
+| `GET` | `/api/cases/:id/environmental-context` | Environmental context records |
+| `GET` | `/api/cases/:id/hypotheses/compare` | Evidence comparison across all hypotheses |
+| `GET` | `/api/cases/:id/hypotheses/:hid/evidence` | Evidence list for one hypothesis |
+
+**Forensic analysis**
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/api/cases/:id/forensic-analysis` | Full deterministic assessment |
+| `GET` | `/api/cases/:id/forensic-analysis/narrative` | AI-generated or heuristic narrative |
+| `POST` | `/api/cases/:id/investigate` | Start a full pipeline run |
+| `POST` | `/api/cases/:id/challenge` | Submit a scientific challenge |
+| `GET` | `/api/cases/:id/challenges` | List challenges for a case |
+
+**Investigation workflow** (requires PostgreSQL or uses in-memory store)
+
+| Method | Path | Description |
+|---|---|---|
+| `POST` | `/api/cases/:id/investigations` | Create investigation |
+| `GET` | `/api/cases/:id/investigations` | List investigations |
+| `GET` | `/api/cases/:id/investigations/:iid` | Get investigation |
+| `PATCH` | `/api/cases/:id/investigations/:iid` | Update status |
+| `POST` | `/api/cases/:id/investigations/:iid/observations` | Add observation |
+| `GET` | `/api/cases/:id/investigations/:iid/observations/:oid` | Get observation |
+| `POST` | `/api/cases/:id/investigations/:iid/challenges` | Add challenge |
+| `GET` | `/api/cases/:id/investigations/:iid/challenges` | List challenges |
+| `PATCH` | `/api/cases/:id/investigations/:iid/challenges/:cid` | Update challenge status |
+| `GET` | `/api/cases/:id/investigations/:iid/forensic-analysis` | Investigation-scoped analysis |
+| `GET` | `/api/cases/:id/investigations/:iid/state` | Investigation state |
+| `GET` | `/api/cases/:id/investigations/:iid/summary` | Summary report |
+| `GET` | `/api/cases/:id/investigations/:iid/artifact` | Generated report artifact |
+| `GET` | `/api/cases/:id/investigations/:iid/assistance` | AI assistance for the investigation |
+| `GET` | `/api/cases/:id/investigations/:iid/history` | Investigation history |
+
+**Cache management**
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/api/cache/evidence/stats` | Cache statistics |
+| `POST` | `/api/cache/evidence/invalidate/:caseId` | Invalidate one case |
+| `POST` | `/api/cache/evidence/invalidate-all` | Clear all cache entries |
+
+---
+
+## Evidence cache
+
+The evidence cache sits between raw file I/O and the exploration and forensic routes. It is an infrastructure optimisation — it does not change any forensic output.
+
+- **Cache key**: `caseId`
+- **Validity**: source-signature check on every access (CSV `mtime`/`size`, `case.json`, `hypotheses.json`)
+- **Automatic invalidation**: any source-file change detected on next request
+- **Concurrent-load deduplication**: multiple simultaneous cold requests for the same case share one underlying `parseEvidenceCSV + buildEvidenceGraph` operation
+- **Failure recovery**: failed loads are never cached; `_inFlight` is cleaned in a `finally` block; subsequent requests can retry from scratch
+- **Mutation safety**: cached row objects are individually frozen (`Object.freeze`); callers receive an unfrozen array of frozen row references
+- **Explicit invalidation**: `POST /api/cache/evidence/invalidate/:caseId` and `POST /api/cache/evidence/invalidate-all`
+
+---
+
+## Project structure
 
 ```
 spaceforensics/
-├── cases/
-│   └── galaxy-15/
-│       ├── case.json                      # Case identity card and scientific metadata
-│       ├── fetch_galaxy15.py              # NASA CDAWeb data pipeline (Python/pandas)
-│       ├── raw/
-│       │   ├── GOES11_K0_EP8.json         # Raw particle flux from NASA CDAWeb
-│       │   ├── GOES11_K0_MAG.json         # Raw magnetic field from NASA CDAWeb
-│       │   └── GOES11_EPHEMERIS_SSC.json  # Raw orbital ephemeris from NASA CDAWeb
-│       └── normalized/
-│           └── galaxy15_evidence.csv      # 278 normalised evidence records
-│
 ├── backend/
-│   ├── server.js                          # Express REST API (6 endpoints)
+│   ├── server.js               # Express app, all routes
 │   ├── services/
-│   │   └── aiEngine.js                    # Dual-pass AI engine (Granite + LangChain)
-│   ├── .env.example                       # Required environment variables
-│   └── package.json
-│
-└── frontend/
-    ├── src/
-    │   ├── App.jsx                        # Root component and state management
-    │   ├── api.js                         # Centralised API fetch helpers
-    │   └── components/
-    │       ├── Header.jsx                 # Sticky top bar with case identity
-    │       ├── EventTimeline.jsx          # Recharts multi-series timeline chart
-    │       ├── HypothesisMatrix.jsx       # Confidence score progress bar grid
-    │       ├── RedTeamPanel.jsx           # Challenge button + counter-evidence list
-    │       └── ReportModal.jsx            # Full-screen exportable forensic report
-    └── package.json
+│   │   ├── evidenceCaseCache.js        # Evidence cache
+│   │   ├── evidenceExploration.js      # Exploration response builders
+│   │   ├── evidenceExplorationService.js
+│   │   ├── forensicAnalysis.js         # Deterministic forensic engine
+│   │   ├── forensicConfig.js           # Shared pipeline constants
+│   │   ├── aiEngine.js                 # LLM client + evidence snapshot
+│   │   ├── aiAnalyst.js                # AI forensic analyst + validation
+│   │   ├── investigationStore.js       # Investigation persistence facade
+│   │   ├── InvestigationRepository.js  # In-memory repository
+│   │   ├── PostgresInvestigationRepository.js
+│   │   ├── artifactService.js          # Report artifact generation
+│   │   └── pipelineLogger.js           # Structured pipeline diagnostics
+│   ├── db/
+│   │   ├── pool.js                     # PostgreSQL connection pool
+│   │   ├── migrate.js                  # Migration runner
+│   │   └── migrations/                 # SQL migration files
+│   └── tests/                          # 58 test suites
+├── frontend/
+│   └── src/
+│       ├── components/                 # React UI components
+│       ├── api.js                      # API client
+│       └── App.jsx
+├── cases/
+│   ├── galaxy-15/                      # G15 evidence and metadata
+│   ├── goes16-sep2017/                 # Second case
+│   └── test-case-alpha/                # Test fixture case
+└── docs/
+    └── ARCHITECTURE.md
 ```
 
 ---
 
-## ⚡ Quick Start
+## Quick start
 
-### Prerequisites
-- Node.js ≥ 18
-- Python ≥ 3.9 (for data pipeline only)
-- IBM Watsonx.ai API key *(optional — deterministic fallback runs without it)*
-
-### 1 — Clone and Install
+**Prerequisites:** Node.js 18+. PostgreSQL is optional (in-memory store is used when `PG_DATABASE` is unset).
 
 ```bash
-git clone https://github.com/your-org/spaceforensics.git
+# 1. Clone
+git clone https://github.com/Ibraderoro/spaceforensics.git
 cd spaceforensics
 
+# 2. Backend
+cd backend
+npm install
+cp .env.example .env
+# Edit .env — at minimum set PORT=5001
+# Optionally add WATSONX_AI_APIKEY, WATSONX_AI_PROJECT_ID for LLM features
+npm start
+
+# 3. Frontend (separate terminal)
+cd frontend
+npm install
+npm run dev
+# Opens at http://localhost:5173
+# API expected at http://localhost:5001
+```
+
+**AI features** require a Watsonx.ai API key and project ID. Without them the system runs in heuristic mode — deterministic forensic analysis is complete; only the AI narrative is replaced by a rule-based fallback.
+
+**PostgreSQL** (optional): set `PG_DATABASE`, `PG_HOST`, `PG_PORT`, `PG_USER`, `PG_PASSWORD` in `backend/.env`. The server runs migrations automatically on startup when `PG_DATABASE` is set.
+
+---
+
+## Testing
+
+Audited v1.0.0 baseline:
+
+| Suite | Files | Tests | Skipped | Failures |
+|---|---|---|---|---|
+| Backend (Jest) | 58 | 2,527 | 118 | 0 |
+| Frontend (Vitest) | 18 | 394 | 0 | 0 |
+| Golden release gate | — | 124 | 0 | 0 |
+
+The 118 skipped backend tests require a live PostgreSQL connection and are skipped when `PG_DATABASE` is not set.
+
+**The golden release gate** (`backend/tests/phase910ReleaseGate.test.js`) runs 124 checks that lock the Galaxy 15 forensic baseline: evidence counts, ID sequences, hypothesis assessments, `causal_attribution_established`, and byte-identical deterministic fingerprints across independent pipeline runs. It must pass at zero failures for any release.
+
+```bash
 # Backend
-cd backend && npm install && cd ..
+cd backend && npm test
 
 # Frontend
-cd frontend && npm install && cd ..
+cd frontend && npm test
+
+# Golden gate only
+cd backend && npx jest --runInBand tests/phase910ReleaseGate.test.js
 ```
 
-### 2 — Configure Environment
+---
 
-```bash
-cp backend/.env.example backend/.env
-# Edit backend/.env and fill in your Watsonx credentials (optional)
-```
+## What this project demonstrates
 
-```env
-PORT=5001
-WATSONX_AI_APIKEY=
-WATSONX_AI_PROJECT_ID=
-WATSONX_AI_URL=https://us-south.ml.cloud.ibm.com
-```
-
-### 3 — Run
-
-```bash
-# Terminal 1 — Backend API
-cd backend && node server.js
-# → SPACEFORENSICS API running on port 5001
-
-# Terminal 2 — Frontend dashboard
-cd frontend && npm run dev
-# → Local: http://localhost:5173
-```
-
-### 4 — Investigate
-
-1. Open **http://localhost:5173**
-2. The timeline chart and case metadata load automatically
-3. Click **Investigate** → Pass 1 hypothesis scores appear with reasoning
-4. Click **🔥 Challenge This Conclusion** → Pass 2 red-team counter-evidence recalibrates the scores
-5. Click **Export Report** → Full forensic summary modal with all sections
+- **Node.js / Express** — REST API design, route organisation, error contracts
+- **Deterministic data processing** — evidence ingestion, ID assignment, provenance, chronological ordering
+- **Graph-based relationships** — hypothesis/evidence graphs with typed relationship categories
+- **AI/LLM integration** — IBM Granite via LangChain `ChatWatsonx`, structured output, graceful degradation
+- **Structured-output validation** — evidence ID verification, assessment matching, causal-attribution guard, probability detection
+- **Hallucination containment** — validation pipeline that prevents AI-invented facts from reaching consumers
+- **Caching** — source-signature-based invalidation, concurrent-load deduplication, mutation-safe frozen rows
+- **Failure recovery** — failed loads never cached, `_inFlight` cleaned in `finally`, retry semantics tested
+- **React / Vite** — component-based UI with Tailwind, Recharts, evidence/hypothesis exploration
+- **PostgreSQL persistence** — investigation workflow state separated from forensic evidence
+- **Automated testing** — 2,921 total tests across backend and frontend; golden gate protecting scientific baseline
+- **Scientific uncertainty handling** — explicit `insufficient_evidence`, limitations surfaced per hypothesis, `causal_attribution_established` as a first-class result
 
 ---
 
-## 🔌 API Reference
+## Documentation
 
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/cases` | List all available cases |
-| `GET` | `/api/cases/:id` | Full case metadata (`case.json`) |
-| `GET` | `/api/cases/:id/timeline` | 278 time-sorted evidence records |
-| `GET` | `/api/cases/:id/evidence-graph` | Hypothesis nodes with supporting/contradicting evidence |
-| `POST` | `/api/cases/:id/investigate` | Pass 1: hypothesis generation + confidence scores |
-| `POST` | `/api/cases/:id/challenge` | Pass 1 + Pass 2: red-team critique + updated scores |
-
----
-
-## 🤖 How IBM Bob Was Used
-
-IBM Bob (AI-assisted software engineering assistant) was the primary tool used to plan, implement, and iterate on every layer of this project. Bob was not used as a code generator for isolated snippets — it acted as a **technical co-pilot** for the full engineering lifecycle:
-
-### Architecture & Planning
-Bob produced detailed, phase-by-phase implementation plans before any code was written:
-- [`galaxy15-fetch-plan.md`](galaxy15-fetch-plan.md) — Data pipeline design: NASA CDAWeb API integration, CDF-JSON parsing strategy, CSV normalisation schema
-- [`backend-api-plan.md`](backend-api-plan.md) — Express REST API design: endpoint contracts, route patterns, helper architecture
-- [`ai-engine-plan.md`](ai-engine-plan.md) — Dual-pass AI engine design: LLM prompt strategy, result schemas, deterministic fallback logic
-- [`frontend-dashboard-plan.md`](frontend-dashboard-plan.md) — React dashboard design: component hierarchy, data flow, Recharts integration
-
-Each plan included explicit expected outcomes, todo checklists, and verification criteria — allowing Bob to track progress across sessions.
-
-### Implementation
-Bob wrote all production code in this repository:
-- The Python data pipeline (`fetch_galaxy15.py`) including the CDAWeb REST client, CDF-JSON structure navigation (discovered live via API inspection), fill-value filtering, and pandas normalisation
-- The entire Express API (`server.js`) including the stream-based CSV parser, evidence graph classifier, and all six route handlers
-- The dual-pass AI engine (`aiEngine.js`) including the `ChatWatsonx` / LangChain integration, prompt templates, JSON response parsing, and the deterministic fallback engine
-- All five React components and the `api.js` service module
-
-### Debugging & Iteration
-Bob helped diagnose real integration issues encountered during development:
-- Discovered that the CDAWeb REST API required `?format=json` as a query parameter (not `Accept` header) and that the correct CDF-JSON nesting path was `CDF[0].cdfVariables.variable[]` (not the assumed `CdaData.Variable`)
-- Resolved a CommonJS / ESM boundary issue with `@langchain/ibm` in a `require()`-based Express server
-- Identified and fixed the macOS AirPlay port conflict (port 5000 → 5001)
-
-### Codebase Q&A
-Throughout development, Bob was used to answer questions about the live codebase — reading files, finding symbol definitions, tracing data flow across layers — without requiring manual file navigation.
-
----
-
-## 📊 Evidence Dataset
-
-| Source | Instrument | Measurement | Resolution | Records |
-|---|---|---|---|---|
-| `GOES11_EP8` | GOES-11 Energetic Particle Sensor | Electron flux >2 MeV (`e_flux`) | 5 min | 36 |
-| `GOES11_MAG` | GOES-11 Magnetometer | Magnetic field GSM (`b_gsm`, nT) | 1 min | 180 |
-| `GOES11_EPHEMERIS` | GOES-11 SSC Ephemeris | Orbital radius (`position`, Re) | 3 min | 61 |
-| `CASE` | Anchor event | Command loss (`galaxy15_anomaly`) | Event | 1 |
-| **Total** | | | | **278** |
-
-**Data window:** 2010-04-05T08:00:00Z → 2010-04-05T11:00:00Z (3 hours)  
-**Source:** [NASA CDAWeb](https://cdaweb.gsfc.nasa.gov) — public, no authentication required
-
----
-
-## ⚠️ Scientific Limitations
-
-These limitations are surfaced explicitly in every investigation report and inform the red-team challenge:
-
-1. GOES-11 was at GEO −135.0° W, approximately 2° from Galaxy 15 at −133.0° W. Particle and field measurements are a proxy, not a direct in-situ sample at the satellite bus.
-2. The 5-minute averaging of EP8 particle flux data smooths sub-minute impulsive flux increases that may have caused single-event upsets.
-3. B_GSM is the local field at GOES-11, not at the Galaxy 15 spacecraft body. No magnetometer was onboard Galaxy 15.
-4. Causation between the space weather environment and the command anomaly is inferred, not established. Ground software and RF link conditions are not captured.
-5. CDAWeb fill values (−1.0E31) indicate data gaps in the Level-2 archive and are removed from the evidence CSV.
-6. GOES-11 ephemeris from SSC is reconstructed orbit data and may differ by tens of kilometres from the real-time position.
-
----
-
-## 🔧 Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Data pipeline | Python 3, `requests`, `pandas` |
-| Backend API | Node.js, Express.js, `csv-parser`, `dotenv` |
-| AI engine | IBM Granite 3.3 8B Instruct, IBM Watsonx.ai, LangChain (`@langchain/ibm`) |
-| Frontend | Vite, React, Tailwind CSS, Recharts, Lucide Icons |
-| Data source | NASA CDAWeb REST API |
-
----
-
-## 📄 License
-
-MIT — see [LICENSE](LICENSE)
+- [Architecture](docs/ARCHITECTURE.md)
