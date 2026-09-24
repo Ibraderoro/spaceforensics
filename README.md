@@ -339,3 +339,7 @@ cd backend && npx jest --runInBand tests/phase910ReleaseGate.test.js
 ## Documentation
 
 - [Architecture](docs/ARCHITECTURE.md)
+- [Demo guide](docs/DEMO.md)
+- [Portfolio case study](docs/PORTFOLIO.md)
+- [Screenshots plan](docs/screenshots/README.md)
+- [Demo script](demo/demo-script.md)
